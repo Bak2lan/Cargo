@@ -24,6 +24,7 @@ public class Delivery {
     private String description;
     private LocalDate dispatchDate;
     private LocalDate arrivalDate;
+    private String transportNumber;
     @Enumerated(EnumType.STRING)
     private TransportType transportType;
     @Enumerated(EnumType.STRING)
@@ -40,12 +41,13 @@ public class Delivery {
     })
     private User user;
 
-    public Delivery(String fromWhere, String toWhere, String description, LocalDate dispatchDate, LocalDate arrivalDate, TransportType transportType, PackageType packageType, TruckSize truckSize, Size size, User user) {
+    public Delivery(String fromWhere, String toWhere, String description, LocalDate dispatchDate, LocalDate arrivalDate, String transportNumber, TransportType transportType, PackageType packageType, TruckSize truckSize, Size size, User user) {
         this.fromWhere = fromWhere;
         this.toWhere = toWhere;
         this.description = description;
         this.dispatchDate = dispatchDate;
         this.arrivalDate = arrivalDate;
+        this.transportNumber = transportNumber;
         this.transportType = transportType;
         this.packageType = packageType;
         this.truckSize = truckSize;

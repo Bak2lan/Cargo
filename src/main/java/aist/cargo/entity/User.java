@@ -29,8 +29,12 @@ public class User {
     private List<Subscription> subscriptions;
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Payment> payments;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Delivery> deliveries;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Sending> sendings;
 
-    public User(String firstName, String lastName, String email, String password, String confirmPassword, String phoneNumber, LocalDate dateOfBirth, Role role, List<Subscription> subscriptions, List<Payment> payments) {
+    public User(String firstName, String lastName, String email, String password, String confirmPassword, String phoneNumber, LocalDate dateOfBirth, Role role, List<Subscription> subscriptions, List<Payment> payments, List<Delivery> deliveries, List<Sending> sendings) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -41,6 +45,8 @@ public class User {
         this.role = role;
         this.subscriptions = subscriptions;
         this.payments = payments;
+        this.deliveries = deliveries;
+        this.sendings = sendings;
     }
 
     public User() {

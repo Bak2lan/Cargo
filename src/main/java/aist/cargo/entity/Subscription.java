@@ -1,14 +1,11 @@
 package aist.cargo.entity;
-
-import aist.cargo.base.Transport;
+import aist.cargo.enums.SubsDuration;
+import aist.cargo.enums.TransportType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "subscriptions")
@@ -19,40 +16,36 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subs_gen")
     @SequenceGenerator(name = "subs_gen", sequenceName = "subs_seq",allocationSize = 1,initialValue = 5)
     private Long id;
-    private String description;
-    private int price;
+    private double  price;
     private LocalDate startDate;
     private LocalDate endDate;
-    @ManyToMany(mappedBy = "subscriptions")
-    private List<User> users;
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "subscription")
-    private List<Payment> payments;
-    @OneToOne(mappedBy = "subscription")
-    private Car car;
-    @OneToOne (mappedBy = "subscription")
-    private AirPlane airPlane;
-    @OneToOne(mappedBy = "subscription")
-    private Truck truck;
-    @OneToOne (mappedBy = "subscription")
-    private Luggage luggage;
-    @OneToOne (mappedBy = "subscription")
-    private Box box;
-    @OneToOne(mappedBy = "subscription")
-    private Envelope envelope;
+    @ManyToOne(cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.PERSIST,
+            CascadeType.REFRESH
+    })
+    private User user;
+    @OneToOne(cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.PERSIST,
+            CascadeType.REFRESH
+    })
+    private Payment payment;
+    @Enumerated(EnumType.STRING)
+    private TransportType transportType;
+    @Enumerated(EnumType.STRING)
+    private SubsDuration duration;
 
-    public Subscription(String description, int price, LocalDate startDate, LocalDate endDate, List<User> users, List<Payment> payments, Car car, AirPlane airPlane, Truck truck, Luggage luggage, Box box, Envelope envelope) {
-        this.description = description;
+    public Subscription(double price, LocalDate startDate, LocalDate endDate, User user, Payment payment, TransportType transportType, SubsDuration duration) {
         this.price = price;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.users = users;
-        this.payments = payments;
-        this.car = car;
-        this.airPlane = airPlane;
-        this.truck = truck;
-        this.luggage = luggage;
-        this.box = box;
-        this.envelope = envelope;
+        this.user = user;
+        this.payment = payment;
+        this.transportType = transportType;
+        this.duration = duration;
     }
 
     public Subscription() {

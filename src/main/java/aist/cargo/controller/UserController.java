@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -14,7 +16,6 @@ import java.util.Map;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Slf4j
 public class UserController {
-    private final AuthenticationService userService;
     private final AuthenticationService authenticationService;
 
     @PostMapping("/signUp")
@@ -30,6 +31,34 @@ public class UserController {
     }
     @PostMapping("/signIn")
     public SignInResponse signIn(@RequestBody @Valid SignInRequest signInRequest) {
-        return userService.signIn(signInRequest);
+        return authenticationService.signIn(signInRequest);
     }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userCrudService.getAllUsers());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        Optional<User> user = userCrudService.getUserById(id);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        return ResponseEntity.ok(userCrudService.createUser(user));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        return ResponseEntity.ok(userCrudService.updateUser(id, user));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userCrudService.deleteUser(id);
+        return ResponseEntity.ok("User deleted successfully");
+    }
+
 }

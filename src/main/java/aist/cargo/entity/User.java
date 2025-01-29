@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -31,8 +30,6 @@ public class User implements UserDetails {
     private boolean accountVerified;
     private boolean loginDisabled;
     private boolean emailConfirmed;
-    @OneToMany(mappedBy = "user")
-    Set<SecureToken> tokens;
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Subscription> subscriptions;
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)

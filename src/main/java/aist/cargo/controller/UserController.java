@@ -1,10 +1,13 @@
 package aist.cargo.controller;
 
 import aist.cargo.dto.user.*;
+import aist.cargo.entity.User;
 import aist.cargo.service.AuthenticationService;
+import aist.cargo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.Optional;
 @Slf4j
 public class UserController {
     private final AuthenticationService authenticationService;
+    private final UserService userCrudService;
 
     @PostMapping("/signUp")
     public SignUpResponse sendOtp(@RequestBody SignUpRequest signUpRequest) {

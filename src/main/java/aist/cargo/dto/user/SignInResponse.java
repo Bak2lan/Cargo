@@ -3,10 +3,9 @@ package aist.cargo.dto.user;
 import lombok.Builder;
 
 @Builder
-public record AuthenticationSignInResponse(
+public record SignInResponse(
         Long id,
         String fullName,
-        String image,
         String token,
         String email
 ) {

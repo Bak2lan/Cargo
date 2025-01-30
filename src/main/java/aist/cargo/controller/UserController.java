@@ -1,25 +1,12 @@
 package aist.cargo.controller;
 
-import aist.cargo.dto.user.AuthenticationSignInResponse;
-import aist.cargo.dto.user.AuthenticationSignUpResponse;
-import aist.cargo.dto.user.SignInRequest;
-import aist.cargo.dto.user.SignUpRequest;
-import aist.cargo.entity.User;
-import aist.cargo.exception.AlreadyExistException;
-import aist.cargo.exception.InvalidTokenException;
+import aist.cargo.dto.user.*;
 import aist.cargo.service.AuthenticationService;
-import aist.cargo.service.UserService;
-import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,40 +16,22 @@ import java.util.Optional;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Slf4j
 public class UserController {
-    private final AuthenticationService userService;
-    private final UserService userCrudService;
-    @Autowired
-    private MessageSource messageSource;
-    private static final String REDIRECT_LOGIN = "redirect:/login";
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/signUp")
-    public AuthenticationSignUpResponse signUp(@Valid @RequestBody SignUpRequest request) throws AlreadyExistException {
-        AuthenticationSignUpResponse response = userService.signUp(request);
-        log.info("User successfully saved with the identifier!!!");
-        return response;
+    public SignUpResponse sendOtp(@RequestBody SignUpRequest signUpRequest) {
+       return authenticationService.signUp(signUpRequest);
     }
 
-    @GetMapping("/verify")
-    public String verifyUser(@RequestParam String token, RedirectAttributes redirectAttributes) {
-        if (StringUtils.isEmpty(token)) {
-            redirectAttributes.addFlashAttribute("tokenError", "Token is invlid");
-            return REDIRECT_LOGIN;
-        }
-        try {
-            userService.verifyUser(token);
-        } catch (InvalidTokenException e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("tokenError", "Token is invlid");
-            return REDIRECT_LOGIN;
-        }
-        redirectAttributes.addFlashAttribute("message",
-                messageSource.getMessage("verification.email.msg", null, LocaleContextHolder.getLocale()));
-        return REDIRECT_LOGIN;
-    }
+    @PostMapping("/verify")
+    public SimpleResponse verifyOtp(@RequestBody Map<String, String> request) {
+        String code = request.get("code");
+        return authenticationService.confirmEmail(code);
 
+    }
     @PostMapping("/signIn")
-    public AuthenticationSignInResponse signIn(@RequestBody @Valid SignInRequest signInRequest) {
-        return userService.signIn(signInRequest);
+    public SignInResponse signIn(@RequestBody @Valid SignInRequest signInRequest) {
+        return authenticationService.signIn(signInRequest);
     }
 
     @GetMapping

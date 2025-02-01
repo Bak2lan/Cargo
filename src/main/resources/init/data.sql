@@ -42,10 +42,3 @@ VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Sending of legal documents', 'Bishkek
        ('2025-02-15', '2025-02-10', 2, 2, 'Sending of office supplies', 'Bishkek', 'BOX', 'M', 'Ozgon'),
        ('2025-02-20', '2025-02-15', 3, 3, 'Sending of gifts', 'Bishkek', 'LUGGAGE', 'L', 'Osh'),
        ('2025-02-25', '2025-02-20', 4, 1, 'Sending of electronics', 'Bishkek', 'BOX', 'M', 'Kant');
-
-INSERT INTO users_subscriptions (subscriptions_id, user_id)
-VALUES (1, 1),
-       (3, 3),
-       (2, 2),
-       (4, 4),
-       (2, 5);

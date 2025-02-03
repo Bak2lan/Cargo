@@ -1,13 +1,13 @@
 -- Таблица пользователей (User)
 INSERT INTO users (account_verified, date_of_birth, email_confirmed, login_disabled, id, email, first_name, last_name,
                    password, phone_number, role)
-VALUES (TRUE, '1990-01-01', TRUE, FALSE, 1, 'admin@mail.com', 'Admin', 'Admin', 'admin123', '1234567890', 'DELIVERY'),
-       (TRUE, '1985-05-10', TRUE, FALSE, 2, 'petr@mail.com', 'Петр', '', 'password456', '0987654321', 'SENDER'),
-       (FALSE, '1995-07-15', FALSE, TRUE, 3, 'anna@mail.com', 'Nur', 'Emilisov', 'password789', '1122334455',
+VALUES (TRUE, '1990-01-01', TRUE, FALSE, 1, 'admin@gmail.com', 'Admin', 'Admin', '$2a$12$bhEvguyAwhAySYNdIB8piuPkvyTeyFZZTctNT0sgZJYqrWvruwpnq' , '1234567890', 'DELIVERY'), --admin123!
+       (TRUE, '1985-05-10', TRUE, FALSE, 2, 'petr@gmail.com', 'Петр', '', '$2a$12$hjywwr/Y1uXCkm0cjrm0Ber3UVGxOzTKKsajqsogjSjrcpSCB7qJi', '0987654321', 'SENDER'), --password456
+       (FALSE, '1995-07-15', FALSE, TRUE, 3, 'anna@gmail.com', 'Nur', 'Emilisov', '$2a$12$KE0RusEcXszOadcqUHCs9eD8cE23yUH6ypI3Ns1G.XNoaXxMyKjQy', '1122334455', --password789
         'DELIVERY'),
-       (TRUE, '1988-12-30', TRUE, FALSE, 4, 'maria@mail.com', 'Marina', 'Egorov', 'password101', '6677889900',
+       (TRUE, '1988-12-30', TRUE, FALSE, 4, 'maria@gmail.com', 'Marina', 'Egorov', '$2a$12$m1t467FdqBt3i97f4bsVjuzUMlgpzpX2gxt.eA1jm9DnUbq/UuGKG', '6677889900', --password101
         'SENDER'),
-       (TRUE, '1992-03-20', TRUE, FALSE, 5, 'dmitry@mail.com', 'Dima', 'Kuza', 'password202', '2233445566',
+       (TRUE, '1992-03-20', TRUE, FALSE, 5, 'dmitry@gmail.com', 'Dima', 'Kuza', '$2a$12$yKNnjh49cOBQBcQcwstqmuUwGt0/8yNY/pUvZF41EjxQprWzHlA2a', '2233445566', --password202
         'DELIVERY');
 
 -- Таблица платежей (Payment)

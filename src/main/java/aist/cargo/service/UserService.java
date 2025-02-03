@@ -1,13 +1,19 @@
 package aist.cargo.service;
 
+import aist.cargo.dto.user.SimpleResponse;
+import aist.cargo.dto.user.UserRequest;
+import aist.cargo.dto.user.UserResponse;
 import aist.cargo.entity.User;
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
-    User createUser(User user);
-    User updateUser(Long id, User user);
-    void deleteUser(Long id);
-    Optional<User> getUserById(Long id);
-    List<User> getAllUsers();
+    User createUser(UserRequest userRequest);
+
+    User updateUser(Long id, UserRequest userRequest);
+
+    SimpleResponse deleteUser(Long id);
+
+    UserResponse getUserById(Long id);
+
+    List<UserResponse> getAllUsers();
 }

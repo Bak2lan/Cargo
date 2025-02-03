@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Builder
 public record DeliveryResponse(
-        Long sendingId,
+        Long deliveryId,
         Long userId,
         String userImage,
         String fullName,

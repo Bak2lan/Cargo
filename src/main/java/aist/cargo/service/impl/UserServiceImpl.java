@@ -11,8 +11,9 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -90,7 +91,6 @@ public class UserServiceImpl implements UserService {
         } else throw new NotFoundException("User not found");
     }
 
-
     @Override
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
@@ -118,6 +118,14 @@ public class UserServiceImpl implements UserService {
                         .phoneNumber(user.getPhoneNumber())
                         .dateOfBirth(user.getDateOfBirth()).build()).toList();
     }
+
+    public User getAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        return userRepository.getUserByEmail(email).orElseThrow(
+                () -> {
+                    log.info("User with email: " + email + " not found!");
+                    return new NotFoundException(String.format("Пользователь с адресом электронной почты: %s не найден!", email));
+                });
+    }
 }
-
-

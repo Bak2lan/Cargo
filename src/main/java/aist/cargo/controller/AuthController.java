@@ -18,7 +18,7 @@ public class AuthController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/signUp")
-    public SignUpResponse sendOtp(@RequestBody SignUpRequest signUpRequest) {
+    public SignUpResponse sendOtp(@RequestBody @Valid SignUpRequest signUpRequest) {
         return authenticationService.signUp(signUpRequest);
     }
 

@@ -3,7 +3,9 @@ package aist.cargo.repository.jdbcTemplate;
 import aist.cargo.dto.user.DeliveryResponse;
 import aist.cargo.enums.PackageType;
 import aist.cargo.enums.Size;
+import aist.cargo.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
@@ -24,9 +26,9 @@ public class DeliveryJDBCTemplate {
                 rs.getString("transportNumber"),
                 rs.getString("description"),
                 rs.getString("fromWhere"),
-                rs.getDate("dispatchDate").toLocalDate(),
+                rs.getDate("dispatchDate") != null ? rs.getDate("dispatchDate").toLocalDate() : null,
                 rs.getString("toWhere"),
-                rs.getDate("arrivalDate").toLocalDate(),
+                rs.getDate("arrivalDate") != null ? rs.getDate("arrivalDate").toLocalDate() : null,
                 rs.getString("packageType") != null ? PackageType.valueOf(rs.getString("packageType")) : null,
                 rs.getString("size") != null ? Size.valueOf(rs.getString("size")) : null,
                 rs.getString("phoneNumber")
@@ -52,7 +54,7 @@ public class DeliveryJDBCTemplate {
                     u.role AS role
                 FROM
                     users u
-                    LEFT JOIN deliveries d ON d.user_id = u.id
+                    INNER JOIN deliveries d ON d.user_id = u.id
                 WHERE
                     u.role = 'DELIVERY'
                 ORDER BY
@@ -63,5 +65,36 @@ public class DeliveryJDBCTemplate {
                     d.dispatch_date DESC;
                 """;
          return jdbcTemplate.query(sql, this::getAllDeliveriesRs, email);
+    }
+
+    public DeliveryResponse getDeliveryById(Long deliveryById) {
+        String sql = """
+                SELECT
+                    d.id AS deliveryId,
+                    u.id AS userId,
+                    u.user_image AS userImage,
+                    concat(u.first_name, ' ', u.last_name) AS fullName,
+                    d.transport_number AS transportNumber,
+                    d.description AS description,
+                    d.from_where AS fromWhere,
+                    COALESCE(d.dispatch_date, CURRENT_DATE) AS dispatchDate,  
+                    d.to_where AS toWhere,
+                    COALESCE(d.arrival_date, CURRENT_DATE) AS arrivalDate, 
+                    d.package_type AS packageType,
+                    d.size AS size,
+                    u.phone_number AS phoneNumber,
+                    u.role AS role
+                FROM
+                    users u
+                    LEFT JOIN deliveries d ON d.user_id = u.id
+                WHERE
+                    u.role = 'DELIVERY'
+                    AND d.id = ? 
+                """;
+        try {
+            return jdbcTemplate.queryForObject(sql, this::getAllDeliveriesRs, deliveryById);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Доставка с ID " + deliveryById + " не найдена!");
+        }
     }
 }

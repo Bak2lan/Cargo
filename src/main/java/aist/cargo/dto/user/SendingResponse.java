@@ -11,7 +11,6 @@ public record SendingResponse(
     Long userId,
     String userImage,
     String fullName,
-    String transportNumber,
     String description,
     String fromWhere,
     LocalDate dispatchDate,

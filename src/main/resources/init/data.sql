@@ -31,7 +31,7 @@ VALUES ('2025-02-28', 99.0, '2025-01-01', 1, 1, 1, 'ONE_MONTH', 'CAR'),
        ('2025-04-30', 999.0, '2025-02-01', 2, 2, 2, 'THREE_MONTH', 'TRUCK'),
        ('2025-07-01', 1499.0, '2025-01-01', 3, 3, 1, 'SIX_MONTH', 'AIRPLANE'),
        ('2026-01-01', 1999.0, '2025-07-01', 4, 4, 2, 'TWELVE_MONTH', 'CAR'),
-       ('2025-11-01', 1099.0, '2025-02-01', 5, 5, 3, 'ONE_MONTH', 'BOAT'),
+       ('2025-11-01', 1099.0, '2025-02-01', 5, 5, 3, 'ONE_MONTH', 'CAR'),
        ('2025-09-30', 1200.0, '2025-03-01', 6, 6, 4, 'THREE_MONTH', 'TRUCK'),
        ('2026-05-01', 1599.0, '2025-04-01', 7, 7, 5, 'SIX_MONTH', 'CAR'),
        ('2026-09-01', 1299.0, '2025-08-01', 8, 8, 6, 'TWELVE_MONTH', 'AIRPLANE'),
@@ -45,12 +45,12 @@ VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Delivery of fragile items', 'Bishkek'
        ('2025-02-15', '2025-02-10', 2, 2, 'Important documents', 'Bishkek', 'ENVELOPE', 'S', 'Cholpon-Ata', '09KG009KOL', 'CAR', 'SMALL'),
        ('2025-02-20', '2025-02-15', 3, 3, 'Electronics', 'Bishkek', 'BOX', 'L', 'Tamchy', '01KG111ONE', 'AIRPLANE', 'LARGE'),
        ('2025-02-25', '2025-02-20', 4, 1, 'Furniture', 'Talas', 'BOX', 'M', 'Balykchy', '04KG222KGZ', 'TRUCK', 'TRUCK'),
-       ('2025-03-10', '2025-03-05', 5, 2, 'Books', 'Bishkek', 'BOOK', 'M', 'Jalal-Abad', '05KG314TZG', 'CAR', 'SMALL'),
-       ('2025-03-15', '2025-03-10', 6, 3, 'Appliances', 'Bishkek', 'APPLIANCE', 'L', 'Karakol', '06KG415HTB', 'TRUCK', 'MEDIUM'),
-       ('2025-03-20', '2025-03-15', 7, 4, 'Clothing', 'Bishkek', 'CLOTHING', 'S', 'Osh', '07KG517IUO', 'AIRPLANE', 'SMALL'),
-       ('2025-03-25', '2025-03-20', 8, 5, 'Furniture', 'Bishkek', 'FURNITURE', 'L', 'Issyk-Kul', '08KG618VGB', 'TRUCK', 'LARGE'),
-       ('2025-04-10', '2025-04-05', 9, 6, 'Toys', 'Bishkek', 'TOYS', 'M', 'Kant', '09KG719GNC', 'CAR', 'MEDIUM'),
-       ('2025-04-15', '2025-04-10', 10, 7, 'Sports Equipment', 'Bishkek', 'SPORT', 'L', 'Naryn', '10KG820TGO', 'TRUCK', 'TRUCK');
+       ('2025-03-10', '2025-03-05', 5, 2, 'Books', 'Bishkek', 'LUGGAGE', 'M', 'Jalal-Abad', '05KG314TZG', 'CAR', 'SMALL'),
+       ('2025-03-15', '2025-03-10', 6, 3, 'Appliances', 'Bishkek', 'ENVELOPE', 'L', 'Karakol', '06KG415HTB', 'TRUCK', 'MEDIUM'),
+       ('2025-03-20', '2025-03-15', 7, 4, 'Clothing', 'Bishkek', 'ENVELOPE', 'S', 'Osh', '07KG517IUO', 'AIRPLANE', 'SMALL'),
+       ('2025-03-25', '2025-03-20', 8, 5, 'Furniture', 'Bishkek', 'LUGGAGE', 'L', 'Issyk-Kul', '08KG618VGB', 'TRUCK', 'LARGE'),
+       ('2025-04-10', '2025-04-05', 9, 6, 'Toys', 'Bishkek', 'LUGGAGE', 'M', 'Kant', '09KG719GNC', 'CAR', 'MEDIUM'),
+       ('2025-04-15', '2025-04-10', 10, 7, 'Sports Equipment', 'Bishkek', 'LUGGAGE', 'L', 'Naryn', '10KG820TGO', 'TRUCK', 'TRUCK');
 
 
 INSERT INTO sendings (arrival_date, dispatch_date, id, user_id, description, from_where, package_type, size, to_where)
@@ -62,8 +62,8 @@ VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Sending of legal documents', 'Bishkek
        ('2025-03-15', '2025-03-10', 6, 3, 'Sending of supplies', 'Bishkek', 'BOX', 'M', 'Jalal-Abad'),
        ('2025-03-20', '2025-03-15', 7, 4, 'Sending of gifts', 'Bishkek', 'LUGGAGE', 'L', 'Talas'),
        ('2025-03-25', '2025-03-20', 8, 5, 'Sending of furniture', 'Bishkek', 'BOX', 'M', 'Balykchy'),
-       ('2025-04-10', '2025-04-05', 9, 6, 'Sending of clothes', 'Bishkek', 'CLOTHING', 'S', 'Issyk-Kul'),
-       ('2025-04-15', '2025-04-10', 10, 7, 'Sending of toys', 'Bishkek', 'TOYS', 'M', 'Karakol');
+       ('2025-04-10', '2025-04-05', 9, 6, 'Sending of clothes', 'Bishkek', 'BOX', 'S', 'Issyk-Kul'),
+       ('2025-04-15', '2025-04-10', 10, 7, 'Sending of toys', 'Bishkek', 'BOX', 'M', 'Karakol');
 
 
 INSERT INTO users_subscriptions (subscriptions_id, user_id)

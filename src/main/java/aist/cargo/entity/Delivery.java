@@ -1,9 +1,6 @@
 package aist.cargo.entity;
 
-import aist.cargo.enums.PackageType;
-import aist.cargo.enums.Size;
-import aist.cargo.enums.TransportType;
-import aist.cargo.enums.TruckSize;
+import aist.cargo.enums.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +29,8 @@ public class Delivery {
     private TruckSize truckSize;
     @Enumerated(EnumType.STRING)
     private Size size;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @ManyToOne(cascade = {
             CascadeType.DETACH,
             CascadeType.MERGE,
@@ -40,7 +39,7 @@ public class Delivery {
     })
     private User user;
 
-    public Delivery(String fromWhere, String toWhere, String description, LocalDate dispatchDate, LocalDate arrivalDate, String transportNumber, TransportType transportType, PackageType packageType, TruckSize truckSize, Size size, User user) {
+    public Delivery(String fromWhere, String toWhere, String description, LocalDate dispatchDate, LocalDate arrivalDate, String transportNumber, TransportType transportType, PackageType packageType, TruckSize truckSize, Size size,Role role, User user) {
         this.fromWhere = fromWhere;
         this.toWhere = toWhere;
         this.description = description;
@@ -51,6 +50,7 @@ public class Delivery {
         this.packageType = packageType;
         this.truckSize = truckSize;
         this.size = size;
+        this.role = role;
         this.user = user;
     }
 

@@ -43,6 +43,7 @@ public class SecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers(
                                         "/",
+                                        "/api/users/**",
                                         "/register/**",
                                         "/deliveryApi/**",
                                         "/deliveryApi/**",

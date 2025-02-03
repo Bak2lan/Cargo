@@ -1,15 +1,24 @@
 package aist.cargo.service.impl;
 
-import aist.cargo.entity.User;
+import aist.cargo.dto.user.SimpleResponse;
+import aist.cargo.dto.user.UserRequest;
+import aist.cargo.dto.user.UserResponse;
+import aist.cargo.entity.*;
+import aist.cargo.exception.NotFoundException;
 import aist.cargo.repository.UserRepository;
 import aist.cargo.service.UserService;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -20,25 +29,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+    public User createUser(UserRequest userRequest) {
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new RuntimeException("User with this email already exist!");
         }
+        User user = new User();
+        user.setFirstName(userRequest.getFirstName());
+        user.setLastName(userRequest.getLastName());
+        user.setEmail(userRequest.getEmail());
+        user.setPassword(userRequest.getPassword());
+        user.setPhoneNumber(userRequest.getPhoneNumber());
+        user.setDateOfBirth(userRequest.getDateOfBirth());
+        user.setRole(userRequest.getRole());
         return userRepository.save(user);
     }
 
     @Override
-    public User updateUser(Long id, User user) {
+    public User updateUser(Long id, UserRequest userRequest) {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
             User updatedUser = existingUser.get();
-            updatedUser.setFirstName(user.getFirstName());
-            updatedUser.setLastName(user.getLastName());
-            updatedUser.setEmail(user.getEmail());
-            updatedUser.setPassword(user.getPassword());
-            updatedUser.setPhoneNumber(user.getPhoneNumber());
-            updatedUser.setDateOfBirth(user.getDateOfBirth());
-            updatedUser.setRole(user.getRole());
+            updatedUser.setFirstName(userRequest.getFirstName());
+            updatedUser.setLastName(userRequest.getLastName());
+            updatedUser.setEmail(userRequest.getEmail());
+            updatedUser.setPassword(userRequest.getPassword());
+            updatedUser.setPhoneNumber(userRequest.getPhoneNumber());
+            updatedUser.setDateOfBirth(userRequest.getDateOfBirth());
+            updatedUser.setRole(userRequest.getRole());
             return userRepository.save(updatedUser);
         } else {
             throw new RuntimeException("User not found with ID: " + id);
@@ -46,21 +63,61 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("User not found with ID: " + id);
-        }
+    public SimpleResponse deleteUser(Long id) {
+        User user = userRepository.getUserById(id);
+        if (user != null) {
+            List<Subscription> subscriptions = user.getSubscriptions();
+            for (Subscription subscription : subscriptions) {
+                subscription.setUser(null);
+            }
+            List<Delivery> deliveries = user.getDeliveries();
+            for (Delivery delivery : deliveries) {
+                delivery.setUser(null);
+            }
+            List<Payment> payments = user.getPayments();
+            for (Payment payment : payments) {
+                payment.setUser(null);
+            }
+            List<Sending> sendings = user.getSendings();
+            for (Sending sending : sendings) {
+                sending.setUser(null);
+            }
+            userRepository.deleteById(user.getId());
+            log.info("User with id {} is deleted", id);
+            return SimpleResponse.builder()
+                    .httpStatus(HttpStatus.OK)
+                    .message("Deleted").build();
+        } else throw new NotFoundException("User not found");
+    }
+
+
+    @Override
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
+
+        return UserResponse
+                .builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .dateOfBirth(user.getDateOfBirth())
+                .build();
     }
 
     @Override
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponse> getAllUsers() {
+        List<User> allUsers = userRepository.findAll();
+        return allUsers.stream()
+                .map(user -> UserResponse.builder()
+                        .id(user.getId())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .email(user.getEmail())
+                        .phoneNumber(user.getPhoneNumber())
+                        .dateOfBirth(user.getDateOfBirth()).build()).toList();
     }
 }
+
+

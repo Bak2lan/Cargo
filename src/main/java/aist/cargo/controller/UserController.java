@@ -2,67 +2,76 @@ package aist.cargo.controller;
 
 import aist.cargo.dto.user.*;
 import aist.cargo.entity.User;
-import aist.cargo.service.AuthenticationService;
 import aist.cargo.service.UserService;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/register")
+@RequestMapping("/api/users")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Slf4j
 public class UserController {
-    private final AuthenticationService authenticationService;
     private final UserService userCrudService;
 
-    @PostMapping("/signUp")
-    public SignUpResponse sendOtp(@RequestBody SignUpRequest signUpRequest) {
-       return authenticationService.signUp(signUpRequest);
-    }
 
-    @PostMapping("/verify")
-    public SimpleResponse verifyOtp(@RequestBody Map<String, String> request) {
-        String code = request.get("code");
-        return authenticationService.confirmEmail(code);
-
-    }
-    @PostMapping("/signIn")
-    public SignInResponse signIn(@RequestBody @Valid SignInRequest signInRequest) {
-        return authenticationService.signIn(signInRequest);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    @Operation(summary = "Get all users", description = "Retrieve a list of all users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list")
+    })
+    @GetMapping("/getAll")
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userCrudService.getAllUsers());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        Optional<User> user = userCrudService.getUserById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @Operation(summary = "Get user by ID", description = "Retrieve user details by their ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping("/get/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        UserResponse user = userCrudService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        return ResponseEntity.ok(userCrudService.createUser(user));
+    @Operation(summary = "Create new user", description = "Create a new user with provided details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User successfully created"),
+            @ApiResponse(responseCode = "400", description = "Invalid user details provided")
+    })
+    @PostMapping("/create")
+    public ResponseEntity<User> createUser(@RequestBody UserRequest userRequest) {
+        return ResponseEntity.ok(userCrudService.createUser(userRequest));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        return ResponseEntity.ok(userCrudService.updateUser(id, user));
+    @Operation(summary = "Update user", description = "Update an existing user's details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User successfully updated"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PutMapping("/update/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) {
+        return ResponseEntity.ok(userCrudService.updateUser(id, userRequest));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userCrudService.deleteUser(id);
-        return ResponseEntity.ok("User deleted successfully");
+    @Operation(summary = "Delete user", description = "Delete a user by their ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<SimpleResponse> deleteUser(@PathVariable Long id) {
+        SimpleResponse simpleResponse = userCrudService.deleteUser(id);
+        return ResponseEntity.status(HttpStatus.OK).body(simpleResponse);
     }
 
 }

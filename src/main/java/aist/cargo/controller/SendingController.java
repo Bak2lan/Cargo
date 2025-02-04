@@ -1,5 +1,6 @@
 package aist.cargo.controller;
 
+import aist.cargo.dto.user.SearchRequest;
 import aist.cargo.dto.user.SendingResponse;
 import aist.cargo.service.SendingService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class SendingController {
     }
 
     @GetMapping
-    public List<SendingResponse> getAllSending(){
-        return sendingService.getAllSendingResponse();
+    public List<SendingResponse> getAllSending(@RequestBody SearchRequest searchRequest){
+        return sendingService.getAllSendingResponse(searchRequest);
     }
 }

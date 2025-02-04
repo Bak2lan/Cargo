@@ -1,5 +1,6 @@
 package aist.cargo.service.impl;
 
+import aist.cargo.dto.user.SearchRequest;
 import aist.cargo.dto.user.SendingResponse;
 import aist.cargo.entity.User;
 import aist.cargo.repository.jdbcTemplate.SendingJDBCTemplate;
@@ -25,7 +26,7 @@ public class SendingServiceImpl implements SendingService {
     }
 
     @Override
-    public List<SendingResponse> getAllSendingResponse() {
+    public List<SendingResponse> getAllSendingResponse(SearchRequest searchRequest) {
         User user = userServiceImpl.getAuthenticatedUser();
         return sendingJDBCTemplate.getAllSending(user.getEmail());
     }

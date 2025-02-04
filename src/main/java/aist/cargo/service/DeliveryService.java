@@ -1,9 +1,12 @@
 package aist.cargo.service;
 
-import aist.cargo.dto.user.DeliveryResponse;
+import aist.cargo.dto.user.CombinedResponse;
+import aist.cargo.dto.user.CargoResponse;
+import aist.cargo.dto.user.SearchRequest;
+
 import java.util.List;
 
 public interface DeliveryService {
-    DeliveryResponse getDeliveryById(Long deliveryId);
-    List<DeliveryResponse> getAllDeliveries();
+    CargoResponse getDeliveryById(Long deliveryId);
+    List<CargoResponse> getAllCargo(SearchRequest searchRequest);
 }

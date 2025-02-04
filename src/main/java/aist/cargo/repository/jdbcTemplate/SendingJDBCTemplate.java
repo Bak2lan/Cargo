@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -54,7 +55,7 @@ public class SendingJDBCTemplate {
                     users u
                         INNER JOIN sendings s ON s.user_id = u.id
                 WHERE
-                    u.role = 'SENDER'
+                    d.from_where ILIKE '%' and d.to_where ILIKE '%' and d.dispatch_date =?3 and d.arrival_date =?4 and d.package_type =?5 and d.size =?6 and u.role = 'SENDER'
                 ORDER BY
                     CASE
                         WHEN u.email = ? THEN 0

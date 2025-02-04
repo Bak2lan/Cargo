@@ -1,6 +1,7 @@
 package aist.cargo.controller;
 
-import aist.cargo.dto.user.DeliveryResponse;
+import aist.cargo.dto.user.CargoResponse;
+import aist.cargo.dto.user.SearchRequest;
 import aist.cargo.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,12 +18,13 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     @GetMapping("/{deliveryId}")
-    public DeliveryResponse getDeliveryById(@PathVariable Long deliveryId) {
+    public CargoResponse getDeliveryById(@PathVariable Long deliveryId) {
         return deliveryService.getDeliveryById(deliveryId);
     }
 
-    @GetMapping
-    public List<DeliveryResponse> getAllDeliveries() {
-        return deliveryService.getAllDeliveries();
+
+    @PostMapping("/search")
+    public List<CargoResponse> getAllCargo(@RequestBody SearchRequest searchRequest) {
+        return deliveryService.getAllCargo(searchRequest);
     }
 }

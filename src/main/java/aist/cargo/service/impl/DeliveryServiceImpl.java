@@ -9,7 +9,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -35,7 +34,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                 searchRequest.arrivalDate(),
                 searchRequest.packageType(),
                 searchRequest.size(),
-                searchRequest.role(), // Роль (DELIVERY или SENDER)
+                searchRequest.role(),
                 user.getEmail()
         );
     }

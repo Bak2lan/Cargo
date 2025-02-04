@@ -6,7 +6,6 @@ import aist.cargo.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -22,8 +21,7 @@ public class DeliveryController {
         return deliveryService.getDeliveryById(deliveryId);
     }
 
-
-    @PostMapping("/search")
+    @GetMapping("/search")
     public List<CargoResponse> getAllCargo(@RequestBody SearchRequest searchRequest) {
         return deliveryService.getAllCargo(searchRequest);
     }

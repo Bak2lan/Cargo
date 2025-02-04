@@ -43,6 +43,8 @@ public class SecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers(
                                         "/",
+                                        "/api/cloudinary/**",
+                                        "/register/**",
                                         "/api/users/**",
                                         "/api/auth/**",
                                         "/api/deliveryApi/**",

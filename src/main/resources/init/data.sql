@@ -11,7 +11,6 @@ VALUES (TRUE, '1990-01-01', TRUE, FALSE, 1, 'admin@mail.com', 'Admin', 'Admin', 
        (TRUE, '1994-02-12', FALSE, TRUE, 9, 'tatyana@mail.com', 'Tatyana', 'Pavlova', '$2y$10$eOQCwBe6U1CWimeHFKulL.GnULKabqjBEhWkeEoOhwHBCKcqVQYmK', '8901234567', 'DELIVERY'),
        (FALSE, '1996-11-20', TRUE, FALSE, 10, 'sergey@mail.com', 'Sergey', 'Golovin', '$2y$10$Z3qloMxJceVLLBt5MUBSb.EeXNdS1FbOmepzkWXBwNN7wt/1i67wa', '9012345678', 'SENDER');
 
-
 -- Таблица платежей (Payment)
 INSERT INTO payments (cvc_code, id, user_id, card_number, expiry_date_of_card, status)
 VALUES (123, 1, 1, '1234 5678 9876 5432', '2026-05-01', 'SUCCESS'),

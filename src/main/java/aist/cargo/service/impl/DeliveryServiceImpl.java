@@ -1,6 +1,7 @@
 package aist.cargo.service.impl;
 
-import aist.cargo.dto.user.DeliveryResponse;
+import aist.cargo.dto.user.CargoResponse;
+import aist.cargo.dto.user.SearchRequest;
 import aist.cargo.entity.User;
 import aist.cargo.repository.jdbcTemplate.DeliveryJDBCTemplate;
 import aist.cargo.service.DeliveryService;
@@ -19,13 +20,22 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final UserServiceImpl userServiceImpl;
 
     @Override
-    public DeliveryResponse getDeliveryById(Long deliveryId) {
+    public CargoResponse getDeliveryById(Long deliveryId) {
         return deliveryJDBCTemplate.getDeliveryById(deliveryId);
     }
 
     @Override
-    public List<DeliveryResponse> getAllDeliveries() {
+    public List<CargoResponse> getAllCargo(SearchRequest searchRequest) {
         User user = userServiceImpl.getAuthenticatedUser();
-        return deliveryJDBCTemplate.getAllDeliveries(user.getEmail());
+        return deliveryJDBCTemplate.getAllCargo(
+                searchRequest.fromWhere(),
+                searchRequest.toWhere(),
+                searchRequest.dispatchDate(),
+                searchRequest.arrivalDate(),
+                searchRequest.packageType(),
+                searchRequest.size(),
+                searchRequest.role(),
+                user.getEmail()
+        );
     }
 }

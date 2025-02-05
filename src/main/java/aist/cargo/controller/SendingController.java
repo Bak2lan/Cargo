@@ -5,7 +5,6 @@ import aist.cargo.service.SendingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,10 +17,5 @@ public class SendingController {
     @GetMapping("/{sendingId}")
     public SendingResponse getSendingById(@PathVariable Long sendingId) {
         return sendingService.getSendingById(sendingId);
-    }
-
-    @GetMapping
-    public List<SendingResponse> getAllSending(){
-        return sendingService.getAllSendingResponse();
     }
 }

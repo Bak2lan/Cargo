@@ -7,6 +7,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.EmptyStackException;
 import java.util.List;
 
 @RestControllerAdvice
@@ -37,6 +39,16 @@ public class GlobalHandlerException {
                 HttpStatus.FORBIDDEN,
                 e.getClass().getSimpleName(),
                 e.getMessage());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse badRequestException (BadRequestException badRequestExeption){
+        return ExceptionResponse.builder()
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .exceptionClassName(badRequestExeption.getClass().getSimpleName())
+                .message(badRequestExeption.getMessage())
+                .build();
     }
 
     @ExceptionHandler(AlreadyExistException.class)

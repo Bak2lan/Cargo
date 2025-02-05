@@ -1,13 +1,14 @@
 package aist.cargo.dto.user;
 
 import aist.cargo.enums.PackageType;
+import aist.cargo.enums.Role;
 import aist.cargo.enums.Size;
 import lombok.Builder;
 import java.time.LocalDate;
 
 @Builder
-public record DeliveryResponse(
-        Long deliveryId,
+public record CargoResponse(
+        Long id,
         Long userId,
         String userImage,
         String fullName,
@@ -19,6 +20,7 @@ public record DeliveryResponse(
         LocalDate arrivalDate,
         PackageType packageType,
         Size size,
-        String phoneNumber
+        String phoneNumber,
+        Role roleType
 ) {
 }

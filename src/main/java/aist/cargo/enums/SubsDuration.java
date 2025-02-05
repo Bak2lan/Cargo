@@ -8,8 +8,7 @@ public enum SubsDuration {
     THREE_MONTH(3, "999 руб"),
     SIX_MONTH(6, "1499 руб"),
     TWELVE_MONTH(12, "1999 руб");
-
-
+    
     private final int months;
     private final String price;
 

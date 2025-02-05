@@ -65,7 +65,7 @@ public class SubscriptionController {
                 subscription.getUser().getEmail(),
                 subscription.getTransportType(),
                 subscription.getDuration(),
-                "ACTIVE" // Можно сделать динамический статус, если есть логика отмены
+                "ACTIVE"
         );
     }
 }

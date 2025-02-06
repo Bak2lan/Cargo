@@ -1,4 +1,5 @@
 package aist.cargo.entity;
+import aist.cargo.enums.PackageType;
 import aist.cargo.enums.SubsDuration;
 import aist.cargo.enums.TransportType;
 import jakarta.persistence.*;
@@ -38,7 +39,10 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     private SubsDuration duration;
 
-    public Subscription(double price, LocalDate startDate, LocalDate endDate, User user, Payment payment, TransportType transportType, SubsDuration duration) {
+    @Enumerated
+    private PackageType packageType;
+
+    public Subscription(double price, LocalDate startDate, LocalDate endDate, User user, Payment payment, TransportType transportType, SubsDuration duration, PackageType packageType) {
         this.price = price;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -46,6 +50,7 @@ public class Subscription {
         this.payment = payment;
         this.transportType = transportType;
         this.duration = duration;
+        this.packageType = packageType;
     }
 
     public Subscription() {

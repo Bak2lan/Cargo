@@ -1,12 +1,10 @@
 package aist.cargo.dto.user;
 
-import aist.cargo.entity.User;
 import aist.cargo.enums.PackageType;
 import aist.cargo.enums.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
 @Getter
@@ -25,3 +23,4 @@ public class SendingResponse {
     private Size size;
 
 }
+

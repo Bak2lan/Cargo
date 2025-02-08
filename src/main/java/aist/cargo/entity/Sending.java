@@ -1,11 +1,11 @@
 package aist.cargo.entity;
 
 import aist.cargo.enums.PackageType;
+import aist.cargo.enums.Role;
 import aist.cargo.enums.Size;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
 @Entity
@@ -33,6 +33,8 @@ public class Sending {
             CascadeType.REFRESH
     })
     private User user;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     public Sending(String fromWhere, String toWhere, String description, LocalDate dispatchDate, LocalDate arrivalDate, PackageType packageType, Size size, User user) {
         this.fromWhere = fromWhere;

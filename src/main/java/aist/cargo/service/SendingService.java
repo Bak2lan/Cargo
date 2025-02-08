@@ -18,3 +18,4 @@ public interface SendingService {
     void deleteSending(Long sendingId);
 
 }
+

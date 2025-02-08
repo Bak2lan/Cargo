@@ -3,6 +3,7 @@ package aist.cargo.controller;
 import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
 import aist.cargo.service.SendingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/sendings")
 public class SendingController {
-
+    @Autowired
     private final SendingService sendingService;
 
     public SendingController(SendingService sendingService) {
@@ -58,4 +59,6 @@ public class SendingController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
+
 }
+

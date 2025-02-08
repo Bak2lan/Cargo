@@ -4,9 +4,7 @@ import aist.cargo.dto.user.SimpleResponse;
 import aist.cargo.dto.user.UserRequest;
 import aist.cargo.dto.user.UserResponse;
 import aist.cargo.entity.User;
-
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
     User createUser(UserRequest userRequest);

@@ -8,15 +8,16 @@ import aist.cargo.exception.NotFoundException;
 import aist.cargo.repository.SendingRepository;
 import aist.cargo.repository.UserRepository;
 import aist.cargo.service.SendingService;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 public class SendingServiceImpl implements SendingService {
+
     private final UserRepository userRepository;
     private final SendingRepository sendingRepository;
 
@@ -109,5 +110,6 @@ public class SendingServiceImpl implements SendingService {
         sendingRepository.delete(sending);
 
     }
+
 }
 

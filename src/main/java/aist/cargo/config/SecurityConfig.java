@@ -43,10 +43,15 @@ public class SecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers(
                                         "/",
-                                        "/api/auth/**",
+
                                         "/api/sendings/**",
-                                        "/api/users/**",
+
+                                        "/api/cloudinary/**",
+
                                         "/register/**",
+                                        "/api/users/**",
+                                        "/api/auth/**",
+                                        "/api/deliveryApi/**",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**")
                                 .permitAll()

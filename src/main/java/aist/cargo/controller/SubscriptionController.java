@@ -29,7 +29,6 @@ public class SubscriptionController {
         );
         return ResponseEntity.ok(mapToResponse(subscription));
     }
-
     @GetMapping("/{id}")
     @Operation(summary = "Get subscription by ID", description = "Retrieve subscription details by its ID")
     public ResponseEntity<SubscriptionResponse> getSubscriptionById(@PathVariable Long id) {
@@ -38,10 +37,11 @@ public class SubscriptionController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get user subscriptions", description = "Retrieve all subscriptions of a specific user")
     public ResponseEntity<List<SubscriptionResponse>> getUserSubscriptions(@PathVariable Long userId) {
-        List<Subscription> subscriptions = subscriptionService.getUserSubscriptions(userId);
+        List<Subscription> subscriptions = subscriptionService.getUserSubscription(userId);
         List<SubscriptionResponse> responseList = subscriptions.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

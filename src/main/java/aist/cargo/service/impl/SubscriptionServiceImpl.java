@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,7 +40,7 @@ class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Optional<Subscription> getUserSubscription(Long userId) {
+    public List<Subscription> getUserSubscription(Long userId) {
         return subscriptionRepository.findByUserId(userId);
     }
 

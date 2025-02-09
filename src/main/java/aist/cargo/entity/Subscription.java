@@ -55,4 +55,7 @@ public class Subscription {
 
     public Subscription() {
     }
+
+    public Subscription(double price, LocalDate startDate, LocalDate endDate, User user, Object o, TransportType transportType, SubsDuration duration) {
+    }
 }

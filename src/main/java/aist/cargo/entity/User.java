@@ -1,5 +1,6 @@
 package aist.cargo.entity;
 
+import aist.cargo.enums.PackageType;
 import aist.cargo.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,6 +30,8 @@ public class User implements UserDetails {
     private LocalDate dateOfBirth;
 
     private String image;
+
+    private String fullName;
     @Enumerated(EnumType.STRING)
     private Role role;
     private boolean accountVerified;
@@ -43,7 +46,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Sending> sendings;
 
-    public User(String firstName, String lastName, String email, String password, String phoneNumber, LocalDate dateOfBirth, String image, Role role, boolean accountVerified, boolean loginDisabled, boolean emailConfirmed, List<Subscription> subscriptions, List<Payment> payments, List<Delivery> deliveries, List<Sending> sendings) {
+    public User(String firstName, String lastName, String email, String password, String phoneNumber, LocalDate dateOfBirth, String image, String fullName, Role role, boolean accountVerified, boolean loginDisabled, boolean emailConfirmed, List<Subscription> subscriptions, List<Payment> payments, List<Delivery> deliveries, List<Sending> sendings) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -51,6 +54,7 @@ public class User implements UserDetails {
         this.phoneNumber = phoneNumber;
         this.dateOfBirth = dateOfBirth;
         this.image = image;
+        this.fullName = fullName;
         this.role = role;
         this.accountVerified = accountVerified;
         this.loginDisabled = loginDisabled;
@@ -62,6 +66,11 @@ public class User implements UserDetails {
     }
 
     public User() {
+    }
+
+    public boolean hasActiveSubscriptionForPackage(PackageType packageType) {
+        return subscriptions.stream()
+                .anyMatch(subscription -> subscription.getPackageType()==packageType);
     }
 
     @Override

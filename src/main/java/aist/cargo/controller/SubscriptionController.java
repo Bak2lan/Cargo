@@ -1,8 +1,8 @@
 package aist.cargo.controller;
-
 import aist.cargo.dto.user.SubscriptionRequest;
 import aist.cargo.dto.user.SubscriptionResponse;
 import aist.cargo.entity.Subscription;
+import aist.cargo.enums.SubsDuration;
 import aist.cargo.service.SubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/subscriptions")
+@RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
@@ -42,7 +41,7 @@ public class SubscriptionController {
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get user subscriptions", description = "Retrieve all subscriptions of a specific user")
     public ResponseEntity<List<SubscriptionResponse>> getUserSubscriptions(@PathVariable Long userId) {
-        Optional<Subscription> subscriptions = subscriptionService.getUserSubscription(userId);
+        List<Subscription> subscriptions = subscriptionService.getUserSubscriptions(userId);
         List<SubscriptionResponse> responseList = subscriptions.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -54,6 +53,15 @@ public class SubscriptionController {
     public ResponseEntity<Void> cancelSubscription(@PathVariable Long id) {
         subscriptionService.cancelSubscription(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/plans")
+    @Operation(summary = "Get subscription plans", description = "Retrieve available subscription plans")
+    public ResponseEntity<List<String>> getPlans() {
+        List<String> plans = List.of(SubsDuration.values()).stream()
+                .map(subsDuration -> subsDuration.name() + " - " + subsDuration.getPrice())
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(plans);
     }
 
     private SubscriptionResponse mapToResponse(Subscription subscription) {
@@ -69,3 +77,4 @@ public class SubscriptionController {
         );
     }
 }
+

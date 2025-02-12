@@ -13,8 +13,9 @@ import java.time.LocalDate;
 public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "delivery_gen")
-    @SequenceGenerator(name = "delivery_gen", sequenceName = "delivery_seq", allocationSize = 1, initialValue = 5)
+    @SequenceGenerator(name = "delivery_gen", sequenceName = "delivery_seq", allocationSize = 1, initialValue = 15)
     private Long id;
+    private String userName;
     private String fromWhere;
     private String toWhere;
     private String description;
@@ -42,7 +43,8 @@ public class Delivery {
     })
     private User user;
 
-    public Delivery(String fromWhere, String toWhere, String description, LocalDate dispatchDate, LocalDate arrivalDate, String transportNumber, TransportType transportType, PackageType packageType, TruckSize truckSize, Size size,Role role, User user) {
+    public Delivery(String userName, String fromWhere, String toWhere, String description, LocalDate dispatchDate, LocalDate arrivalDate, String transportNumber, TransportType transportType, PackageType packageType, TruckSize truckSize, Size size,Role role, User user) {
+        this.userName = userName;
         this.fromWhere = fromWhere;
         this.toWhere = toWhere;
         this.description = description;

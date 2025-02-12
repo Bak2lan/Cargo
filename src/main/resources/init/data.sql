@@ -64,14 +64,9 @@ VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Sending of legal documents', 'Bishkek
        ('2025-04-10', '2025-04-05', 9, 6, 'Sending of clothes', 'Bishkek', 'BOX', 'S', 'Issyk-Kul', 'ARCHIVED'),
        ('2025-04-15', '2025-04-10', 10, 7, 'Sending of toys', 'Bishkek', 'BOX', 'M', 'Karakol', 'ARCHIVED');
 
--- INSERT INTO users (subscriptions_id, user_id)
--- VALUES (1, 1),
---        (3, 3),
---        (2, 2),
---        (4, 4),
---        (2, 5),
---        (5, 6),
---        (6, 7),
---        (7, 8),
---        (8, 9),
---        (9, 10);
+
+
+INSERT INTO subscriptions (id, price, start_date, end_date, user_id)
+VALUES (1, 99.99, '2025-01-01', '2025-12-31', 1),
+       (2, 49.99, '2025-02-01', '2025-08-01', 2),
+       (3, 79.99, '2025-03-01', '2025-09-30', 3);

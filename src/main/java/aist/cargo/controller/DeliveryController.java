@@ -29,12 +29,8 @@ public class DeliveryController {
         return deliveryService.getAllCargo(searchRequest);
     }
 
-//    @PostMapping("/check/subscription")
-//    public String checkSubscription(Principal principal) {
-//        return deliveryService.isUserSubscribed(principal.getName());
-//    }
 
-    @PostMapping
+    @PostMapping("create/Delivery")
     public String createDelivery(@RequestBody DeliveryRequest deliveryRequest, Principal principal) {
         return deliveryService.createDelivery(deliveryRequest, principal.getName());
     }

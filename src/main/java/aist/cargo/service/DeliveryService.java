@@ -11,7 +11,5 @@ public interface DeliveryService {
 
     List<CargoResponse> getAllCargo(SearchRequest searchRequest);
 
-//    String isUserSubscribed(String userEmail);
-
     String createDelivery(DeliveryRequest deliveryRequest, String userEmail);
 }

@@ -51,11 +51,6 @@ public class DeliveryServiceImpl implements DeliveryService {
         );
     }
 
-
-//    public String isUserSubscribed(String userEmail) {
-//
-//    }
-
     @Override
     public String createDelivery(DeliveryRequest deliveryRequest, String userEmail) {
         User user = userRepository.getUserByEmail(userEmail).orElseThrow(
@@ -86,6 +81,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
             return user.getId().toString();
         }else {
+
             return "No subscription found for the user with email:" + userEmail;
         }
     }
@@ -93,6 +89,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 
 public boolean isAddressValid(String address) {
+
     try {
         log.info("test8");
         String url = "https://nominatim.openstreetmap.org/search?q=" + address + "&format=json&addressdetails=1";

@@ -3,6 +3,7 @@ package aist.cargo.entity;
 import aist.cargo.enums.PackageType;
 import aist.cargo.enums.Role;
 import aist.cargo.enums.Size;
+import aist.cargo.enums.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +36,8 @@ public class Sending {
     private User user;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
 
     public Sending(String fromWhere, String toWhere, String description, LocalDate dispatchDate, LocalDate arrivalDate, PackageType packageType, Size size, User user) {
         this.fromWhere = fromWhere;

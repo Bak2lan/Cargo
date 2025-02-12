@@ -2,7 +2,11 @@ package aist.cargo.controller;
 
 import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
+import aist.cargo.entity.Sending;
 import aist.cargo.service.SendingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +64,36 @@ public class SendingController {
         }
     }
 
+    @GetMapping("/getAllArchived")
+    @Operation(summary = "Получить все заархивированные данные")
+    public ResponseEntity<List<SendingResponse>> getAllArchivedSendings() {
+        List<SendingResponse> archivedSendings = sendingService.getAllArchived();
+        if (archivedSendings.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(archivedSendings);
+    }
+
+    @PutMapping("/{id}/archive")
+    @Operation(summary = "Архивирует отправку", description = "Изменяет статус отправки на 'ARCHIVED'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sending archived successfully"),
+            @ApiResponse(responseCode = "400", description = "Sending is already archived"),
+            @ApiResponse(responseCode = "404", description = "Sending not found")
+    })
+    public ResponseEntity<String> archiveSending(@PathVariable Long id) {
+        return sendingService.archiveSending(id);
+    }
+
+    @PutMapping("/{id}/activate")
+    @Operation(summary = "Активирует отправку", description = "Изменяет статус отправки на 'ACTIVE'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sending activated successfully"),
+            @ApiResponse(responseCode = "400", description = "Sending is already active"),
+            @ApiResponse(responseCode = "404", description = "Sending not found")
+    })
+    public ResponseEntity<String> activateSending(@PathVariable Long id) {
+        return sendingService.activateSending(id);
+    }
 }
 

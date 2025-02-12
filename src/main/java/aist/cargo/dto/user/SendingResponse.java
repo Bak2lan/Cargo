@@ -2,6 +2,7 @@ package aist.cargo.dto.user;
 
 import aist.cargo.enums.PackageType;
 import aist.cargo.enums.Size;
+import aist.cargo.enums.Status;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class SendingResponse {
     private LocalDate arrivalDate;
     private PackageType packageType;
     private Size size;
+    private Status status;
 
 }
 

@@ -2,6 +2,7 @@ package aist.cargo.service;
 
 import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -17,5 +18,11 @@ public interface SendingService {
 
     void deleteSending(Long sendingId);
 
+    ResponseEntity<String> archiveSending(Long id);
+
+    ResponseEntity<String> activateSending(Long id);
+
+
+    List<SendingResponse> getAllArchived();
 }
 

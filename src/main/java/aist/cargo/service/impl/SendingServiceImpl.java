@@ -4,16 +4,21 @@ import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
 import aist.cargo.entity.Sending;
 import aist.cargo.entity.User;
+import aist.cargo.enums.Status;
 import aist.cargo.exception.NotFoundException;
 import aist.cargo.repository.SendingRepository;
 import aist.cargo.repository.UserRepository;
 import aist.cargo.service.SendingService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SendingServiceImpl implements SendingService {
@@ -108,8 +113,53 @@ public class SendingServiceImpl implements SendingService {
         Sending sending = sendingRepository.findById(sendingId)
                 .orElseThrow(() -> new RuntimeException("Отправка не найдена"));
         sendingRepository.delete(sending);
-
     }
 
+    @Override
+    public ResponseEntity<String> archiveSending(Long id) {
+        Sending sending = sendingRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sending not found"));
+
+        if (sending.getStatus() == Status.ARCHIVED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sending is already archived.");
+        }
+
+        sending.setStatus(Status.ARCHIVED);
+        sendingRepository.save(sending);
+        return ResponseEntity.ok("Sending archived successfully.");
+    }
+
+    @Override
+    public ResponseEntity<String> activateSending(Long id) {
+        Sending sending = sendingRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sending not found"));
+
+        if (sending.getStatus() == Status.ACTIVE) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sending is already active.");
+        }
+
+        sending.setStatus(Status.ACTIVE);
+        sendingRepository.save(sending);
+        return ResponseEntity.ok("Sending activated successfully.");
+    }
+
+    @Override
+    public List<SendingResponse> getAllArchived() {
+        return sendingRepository.findByStatus(Status.ARCHIVED).stream()
+                .map(sending -> SendingResponse.builder()
+                        .id(sending.getId())
+                        .fullName(sending.getUser().getFullName())
+                        .phoneNumber(sending.getUser().getPhoneNumber())
+                        .description(sending.getDescription())
+                        .fromWhere(sending.getFromWhere())
+                        .toWhere(sending.getToWhere())
+                        .dispatchDate(sending.getDispatchDate())
+                        .arrivalDate(sending.getArrivalDate())
+                        .packageType(sending.getPackageType())
+                        .size(sending.getSize())
+                        .status(sending.getStatus())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }
 

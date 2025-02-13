@@ -19,7 +19,7 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_gen")
-    @SequenceGenerator(name = "user_gen", sequenceName = "user_seq", allocationSize = 1, initialValue = 6)
+    @SequenceGenerator(name = "user_gen", sequenceName = "user_seq", allocationSize = 1, initialValue = 14)
     private Long id;
     private String userImage;
     private String firstName;
@@ -28,9 +28,7 @@ public class User implements UserDetails {
     private String password;
     private String phoneNumber;
     private LocalDate dateOfBirth;
-
     private String image;
-
     private String fullName;
     @Enumerated(EnumType.STRING)
     private Role role;

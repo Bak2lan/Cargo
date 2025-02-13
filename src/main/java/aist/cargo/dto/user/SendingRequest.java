@@ -3,6 +3,7 @@ package aist.cargo.dto.user;
 import aist.cargo.enums.PackageType;
 import aist.cargo.enums.Size;
 import aist.cargo.enums.SubsDuration;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,5 +21,7 @@ public class SendingRequest {
     private LocalDate arrivalDate;
     private PackageType packageType;
     private Size size;
-    private SubsDuration subsDuration;  // если нужно для проверки подписки
+    private SubsDuration subsDuration;
+
+
 }

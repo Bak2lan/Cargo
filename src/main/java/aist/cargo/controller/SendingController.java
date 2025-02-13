@@ -2,7 +2,6 @@ package aist.cargo.controller;
 
 import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
-import aist.cargo.entity.Sending;
 import aist.cargo.service.SendingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,7 +63,7 @@ public class SendingController {
         }
     }
 
-    @GetMapping("/archived")
+    @GetMapping("/getAllArchived")
     @Operation(summary = "Все архивированные отправки")
     public ResponseEntity<List<SendingResponse>> getAllArchived() {
         List<SendingResponse> sendings = sendingService.getAllArchived();

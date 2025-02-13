@@ -39,24 +39,23 @@ public class DeliveryController {
 
     }
 
-    @GetMapping("/archived")
+    @GetMapping("/getAllArchived")
     @Operation(summary = "Все архивированные доставки")
     public ResponseEntity<List<CargoResponse>> getArchivedDeliveries() {
         List<CargoResponse> deliveries = deliveryService.getAllArchivedDeliveries();
         return ResponseEntity.ok(deliveries);
     }
 
-    @PutMapping("/archived/{id}")
+    @PutMapping("/archive/{deliveryId}")
     @Operation(summary = "Архивирует доставки", description = "Изменяет статус отправления на 'ARCHIVED'")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Delivery archived successfully"),
             @ApiResponse(responseCode = "400", description = "Delivery is already archived"),
             @ApiResponse(responseCode = "404", description = "Delivery not found or does not belong to the user")
     })
-    public ResponseEntity<String> archiveDelivery(@PathVariable Long id) {
-       return deliveryService.archiveDelivery(id);
+    public ResponseEntity<String> archiveDelivery(@PathVariable Long deliveryId) {
+       return deliveryService.archiveDelivery(deliveryId);
     }
-
 
     @PutMapping("/activate/{id}")
     @Operation(summary = "Активирует доставки", description = "Изменяет статус отправления на 'ACTIVE'")

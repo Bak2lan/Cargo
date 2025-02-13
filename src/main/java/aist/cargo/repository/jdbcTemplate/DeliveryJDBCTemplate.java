@@ -142,60 +142,6 @@ public class DeliveryJDBCTemplate {
         }
     }
 
-    public List<CargoResponse> getArchivedDeliveries(String email) {
-        String sql = """
-                SELECT
-                    d.id, u.id AS userId, u.user_image AS userImage,
-                    CONCAT(u.first_name, ' ', u.last_name) AS fullName,
-                    d.transport_number, d.description, d.from_where,
-                    d.dispatch_date, d.to_where, d.arrival_date,
-                    d.package_type, d.size, u.phone_number, u.role
-                FROM users u
-                INNER JOIN deliveries d ON d.user_id = u.id
-                WHERE d.status = 'ARCHIVED' AND u.email != 'petr@mail.com'
-                ORDER BY d.arrival_date DESC
-                """;
-
-        List<CargoResponse> result = jdbcTemplate.query(sql, this::getAllCargoRs, email);
-        if (result.isEmpty()) {
-            throw new NotFoundException("Архивные доставки не найдены.");
-        }
-        return result;
-    }
-
-    public List<CargoResponse> getAllArchivedDeliveries(String email) {
-        String sql = """
-                    SELECT
-                    d.id AS id,
-                    u.id AS userId,
-                    u.user_image AS userImage,
-                    CONCAT(u.first_name, ' ', u.last_name) AS fullName,
-                    d.transport_number AS transportNumber,
-                    d.description AS description,
-                    d.from_where AS fromWhere,
-                    d.dispatch_date AS dispatchDate,
-                    d.to_where AS toWhere,
-                    d.arrival_date AS arrivalDate,
-                    d.package_type AS packageType,
-                    d.size AS size,
-                    u.phone_number AS phoneNumber,
-                    u.role AS roleType
-                FROM
-                    users u
-                INNER JOIN deliveries d ON d.user_id = u.id
-                WHERE
-                    d.status = 'ARCHIVED'
-                    AND u.email != ?
-                ORDER BY d.arrival_date DESC
-                """;
-
-        List<CargoResponse> result = jdbcTemplate.query(sql, this::getAllCargoRs, email);
-        if (result.isEmpty()) {
-            throw new NotFoundException("Архивные доставки не найдены.");
-        }
-        return result;
-    }
-
     public String getDeliveryStatus(Long id) {
         String sql = "SELECT status FROM deliveries WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, String.class, id);

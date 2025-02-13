@@ -152,36 +152,36 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
-    public ResponseEntity<String> archiveDelivery(Long id) {
+    public ResponseEntity<String> archiveDelivery(Long deliveryId) {
         User user = userServiceImpl.getAuthenticatedUser();
 
-        if (deliveryJDBCTemplate.isDeliveryOwnedByUser(id, user.getId())) {
+        if (deliveryJDBCTemplate.isDeliveryOwnedByUser(deliveryId, user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have permission to archive this delivery.");
         }
-        String currentStatus = deliveryJDBCTemplate.getDeliveryStatus(id);
+        String currentStatus = deliveryJDBCTemplate.getDeliveryStatus(deliveryId);
 
         if ("ARCHIVED".equals(currentStatus)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The delivery is already archived!");
         }
 
-        deliveryJDBCTemplate.updateDeliveryStatus(id, "ARCHIVED");
+        deliveryJDBCTemplate.updateDeliveryStatus(deliveryId, "ARCHIVED");
         return ResponseEntity.ok("Delivery successfully archived.");
     }
 
     @Override
-    public ResponseEntity<String> activateDelivery(Long id) {
+    public ResponseEntity<String> activateDelivery(Long deliveryId) {
         User user = userServiceImpl.getAuthenticatedUser();
 
-        if (deliveryJDBCTemplate.isDeliveryOwnedByUser(id, user.getId())) {
+        if (deliveryJDBCTemplate.isDeliveryOwnedByUser(deliveryId, user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have permission to activate this delivery.");
         }
-        String currentStatus = deliveryJDBCTemplate.getDeliveryStatus(id);
+        String currentStatus = deliveryJDBCTemplate.getDeliveryStatus(deliveryId);
 
         if ("ACTIVE".equals(currentStatus)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The delivery is already active!");
         }
 
-        deliveryJDBCTemplate.updateDeliveryStatus(id, "ACTIVE");
+        deliveryJDBCTemplate.updateDeliveryStatus(deliveryId, "ACTIVE");
         return ResponseEntity.ok("Delivery successfully activated.");
     }
 }

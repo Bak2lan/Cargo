@@ -14,9 +14,9 @@ public interface DeliveryService {
 
     String createDelivery(DeliveryRequest deliveryRequest, String userEmail);
 
-    ResponseEntity<String> archiveDelivery(Long id);
+    ResponseEntity<String> archiveDelivery(Long deliveryId);
 
-    ResponseEntity<String> activateDelivery(Long id);
+    ResponseEntity<String> activateDelivery(Long deliveryId);
 
     List<CargoResponse> getAllArchivedDeliveries();
 }

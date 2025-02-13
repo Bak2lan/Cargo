@@ -5,6 +5,7 @@ import aist.cargo.dto.user.DeliveryRequest;
 import aist.cargo.dto.user.SearchRequest;
 import aist.cargo.entity.Delivery;
 import aist.cargo.entity.User;
+import aist.cargo.enums.Status;
 import aist.cargo.exception.NotFoundException;
 import aist.cargo.repository.DeliveryRepository;
 import aist.cargo.repository.UserRepository;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -129,27 +131,57 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
-    public List<CargoResponse> getArchivedDeliveries(String email) {
-        return deliveryJDBCTemplate.getAllArchivedDeliveries(email);
+    public List<CargoResponse> getAllArchivedDeliveries() {
+        User user = userServiceImpl.getAuthenticatedUser();
+
+        return user.getDeliveries().stream()
+                .filter(delivery -> delivery.getStatus() == Status.ARCHIVED)
+                .map(delivery -> CargoResponse.builder()
+                        .id(delivery.getId())
+                        .fullName(delivery.getUser().getFullName())
+                        .phoneNumber(delivery.getUser().getPhoneNumber())
+                        .description(delivery.getDescription())
+                        .fromWhere(delivery.getFromWhere())
+                        .toWhere(delivery.getToWhere())
+                        .dispatchDate(delivery.getDispatchDate())
+                        .arrivalDate(delivery.getArrivalDate())
+                        .packageType(delivery.getPackageType())
+                        .size(delivery.getSize())
+                        .build())
+                .toList();
     }
 
-    public void archiveDelivery(Long id) {
+    @Override
+    public ResponseEntity<String> archiveDelivery(Long id) {
+        User user = userServiceImpl.getAuthenticatedUser();
+
+        if (deliveryJDBCTemplate.isDeliveryOwnedByUser(id, user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have permission to archive this delivery.");
+        }
         String currentStatus = deliveryJDBCTemplate.getDeliveryStatus(id);
 
         if ("ARCHIVED".equals(currentStatus)) {
-            throw new IllegalStateException("Доставка уже в архиве!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The delivery is already archived!");
         }
 
         deliveryJDBCTemplate.updateDeliveryStatus(id, "ARCHIVED");
+        return ResponseEntity.ok("Delivery successfully archived.");
     }
 
-    public void activateDelivery(Long id) {
+    @Override
+    public ResponseEntity<String> activateDelivery(Long id) {
+        User user = userServiceImpl.getAuthenticatedUser();
+
+        if (deliveryJDBCTemplate.isDeliveryOwnedByUser(id, user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have permission to activate this delivery.");
+        }
         String currentStatus = deliveryJDBCTemplate.getDeliveryStatus(id);
 
         if ("ACTIVE".equals(currentStatus)) {
-            throw new IllegalStateException("Доставка уже активна!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The delivery is already active!");
         }
 
         deliveryJDBCTemplate.updateDeliveryStatus(id, "ACTIVE");
+        return ResponseEntity.ok("Delivery successfully activated.");
     }
 }

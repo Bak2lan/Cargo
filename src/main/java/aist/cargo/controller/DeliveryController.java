@@ -4,6 +4,9 @@ import aist.cargo.dto.user.CargoResponse;
 import aist.cargo.dto.user.DeliveryRequest;
 import aist.cargo.dto.user.SearchRequest;
 import aist.cargo.service.DeliveryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -37,20 +40,32 @@ public class DeliveryController {
     }
 
     @GetMapping("/archived")
-    public ResponseEntity<List<CargoResponse>> getAllArchivedDeliveries(@RequestParam String email) {
-        List<CargoResponse> archivedDeliveries = deliveryService.getArchivedDeliveries(email);
-        return ResponseEntity.ok(archivedDeliveries);
+    @Operation(summary = "Все архивированные доставки")
+    public ResponseEntity<List<CargoResponse>> getArchivedDeliveries() {
+        List<CargoResponse> deliveries = deliveryService.getAllArchivedDeliveries();
+        return ResponseEntity.ok(deliveries);
     }
 
-    @PutMapping("/{id}/archive")
+    @PutMapping("/archived/{id}")
+    @Operation(summary = "Архивирует доставки", description = "Изменяет статус отправления на 'ARCHIVED'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Delivery archived successfully"),
+            @ApiResponse(responseCode = "400", description = "Delivery is already archived"),
+            @ApiResponse(responseCode = "404", description = "Delivery not found or does not belong to the user")
+    })
     public ResponseEntity<String> archiveDelivery(@PathVariable Long id) {
-        deliveryService.archiveDelivery(id);
-        return ResponseEntity.ok("Delivery archived successfully");
+       return deliveryService.archiveDelivery(id);
     }
 
-    @PutMapping("/{id}/activate")
+
+    @PutMapping("/activate/{id}")
+    @Operation(summary = "Активирует доставки", description = "Изменяет статус отправления на 'ACTIVE'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Delivery activated successfully"),
+            @ApiResponse(responseCode = "400", description = "Delivery is already active"),
+            @ApiResponse(responseCode = "404", description = "Delivery not found or does not belong to the user")
+    })
     public ResponseEntity<String> activateDelivery(@PathVariable Long id) {
-        deliveryService.activateDelivery(id);
-        return ResponseEntity.ok("Delivery activated successfully");
+       return deliveryService.activateDelivery(id);
     }
 }

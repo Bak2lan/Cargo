@@ -18,9 +18,9 @@ public interface SendingService {
 
     void deleteSending(Long sendingId);
 
-    ResponseEntity<String> archiveSending(Long id);
+    ResponseEntity<String> archiveSending(Long sendingId);
 
-    ResponseEntity<String> activateSending(Long id);
+    ResponseEntity<String> activateSending(Long sendingId);
 
 
     List<SendingResponse> getAllArchived();

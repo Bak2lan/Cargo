@@ -3,6 +3,7 @@ package aist.cargo.service;
 import aist.cargo.dto.user.CargoResponse;
 import aist.cargo.dto.user.DeliveryRequest;
 import aist.cargo.dto.user.SearchRequest;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -13,9 +14,9 @@ public interface DeliveryService {
 
     String createDelivery(DeliveryRequest deliveryRequest, String userEmail);
 
-    void archiveDelivery(Long id);
+    ResponseEntity<String> archiveDelivery(Long id);
 
-    void activateDelivery(Long id);
+    ResponseEntity<String> activateDelivery(Long id);
 
-    List<CargoResponse> getArchivedDeliveries(String email);
+    List<CargoResponse> getAllArchivedDeliveries();
 }

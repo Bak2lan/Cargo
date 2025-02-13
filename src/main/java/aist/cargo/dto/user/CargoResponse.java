@@ -3,7 +3,6 @@ package aist.cargo.dto.user;
 import aist.cargo.enums.PackageType;
 import aist.cargo.enums.Role;
 import aist.cargo.enums.Size;
-import aist.cargo.enums.Status;
 import lombok.Builder;
 import java.time.LocalDate;
 
@@ -21,7 +20,6 @@ public record CargoResponse(
         LocalDate arrivalDate,
         PackageType packageType,
         Size size,
-        Status status,
         String phoneNumber,
         Role roleType
 ) {

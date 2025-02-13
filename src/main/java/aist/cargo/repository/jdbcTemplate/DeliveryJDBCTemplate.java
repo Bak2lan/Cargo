@@ -4,7 +4,6 @@ import aist.cargo.dto.user.CargoResponse;
 import aist.cargo.enums.PackageType;
 import aist.cargo.enums.Role;
 import aist.cargo.enums.Size;
-import aist.cargo.enums.Status;
 import aist.cargo.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -23,23 +22,22 @@ public class DeliveryJDBCTemplate {
     private final JdbcTemplate jdbcTemplate;
 
     CargoResponse getAllCargoRs(ResultSet rs, int rowNum) throws SQLException {
-        return CargoResponse.builder()
-                .id(rs.getLong("id"))
-                .userId(rs.getLong("userId"))
-                .userImage(rs.getString("userImage"))
-                .fullName(rs.getString("fullName"))
-                .transportNumber(rs.getString("transportNumber"))
-                .description(rs.getString("description"))
-                .fromWhere(rs.getString("fromWhere"))
-                .dispatchDate(rs.getDate("dispatchDate") != null ? rs.getDate("dispatchDate").toLocalDate() : null)
-                .toWhere(rs.getString("toWhere"))
-                .arrivalDate(rs.getDate("arrivalDate") != null ? rs.getDate("arrivalDate").toLocalDate() : null)
-                .packageType(PackageType.valueOf(rs.getString("packageType")))
-                .size(Size.valueOf(rs.getString("size")))
-                .status(Status.valueOf(rs.getString("status")))
-                .phoneNumber(rs.getString("phoneNumber"))
-                .roleType(Role.valueOf(rs.getString("roleType")))
-                .build();
+        return new CargoResponse(
+                rs.getLong("id"),
+                rs.getLong("userId"),
+                rs.getString("userImage"),
+                rs.getString("fullName"),
+                rs.getString("transportNumber"),
+                rs.getString("description"),
+                rs.getString("fromWhere"),
+                rs.getDate("dispatchDate") != null ? rs.getDate("dispatchDate").toLocalDate() : null,
+                rs.getString("toWhere"),
+                rs.getDate("arrivalDate") != null ? rs.getDate("arrivalDate").toLocalDate() : null,
+                rs.getString("packageType") != null ? PackageType.valueOf(rs.getString("packageType")) : null,
+                rs.getString("size") != null ? Size.valueOf(rs.getString("size")) : null,
+                rs.getString("phoneNumber"),
+                rs.getString("roleType") != null ? Role.valueOf(rs.getString("roleType")) : null
+                );
     }
 
     public List<CargoResponse> getAllCargo(String fromWhere, String toWhere, LocalDate dispatchDate, LocalDate arrivalDate,
@@ -144,6 +142,27 @@ public class DeliveryJDBCTemplate {
         }
     }
 
+    public List<CargoResponse> getArchivedDeliveries(String email) {
+        String sql = """
+                SELECT
+                    d.id, u.id AS userId, u.user_image AS userImage,
+                    CONCAT(u.first_name, ' ', u.last_name) AS fullName,
+                    d.transport_number, d.description, d.from_where,
+                    d.dispatch_date, d.to_where, d.arrival_date,
+                    d.package_type, d.size, u.phone_number, u.role
+                FROM users u
+                INNER JOIN deliveries d ON d.user_id = u.id
+                WHERE d.status = 'ARCHIVED' AND u.email != 'petr@mail.com'
+                ORDER BY d.arrival_date DESC
+                """;
+
+        List<CargoResponse> result = jdbcTemplate.query(sql, this::getAllCargoRs, email);
+        if (result.isEmpty()) {
+            throw new NotFoundException("Архивные доставки не найдены.");
+        }
+        return result;
+    }
+
     public List<CargoResponse> getAllArchivedDeliveries(String email) {
         String sql = """
                     SELECT
@@ -163,7 +182,7 @@ public class DeliveryJDBCTemplate {
                     u.role AS roleType
                 FROM
                     users u
-                LEFT JOIN deliveries d ON d.user_id = u.id
+                INNER JOIN deliveries d ON d.user_id = u.id
                 WHERE
                     d.status = 'ARCHIVED'
                     AND u.email != ?
@@ -188,5 +207,11 @@ public class DeliveryJDBCTemplate {
         if (rowsAffected == 0) {
             throw new NotFoundException("Доставка с ID " + id + " не найдена!");
         }
+    }
+
+    public boolean isDeliveryOwnedByUser(Long deliveryId, Long userId) {
+        String sql = "SELECT COUNT(*) FROM deliveries WHERE id = ? AND user_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, deliveryId, userId);
+        return count == null || count <= 0;
     }
 }

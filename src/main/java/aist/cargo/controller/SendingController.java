@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,36 +65,33 @@ public class SendingController {
         }
     }
 
-    @GetMapping("/getAllArchived")
-    @Operation(summary = "Получить все заархивированные данные")
-    public ResponseEntity<List<SendingResponse>> getAllArchivedSendings() {
-        List<SendingResponse> archivedSendings = sendingService.getAllArchived();
-        if (archivedSendings.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(archivedSendings);
+    @GetMapping("/archived")
+    @Operation(summary = "Все архивированные отправки")
+    public ResponseEntity<List<SendingResponse>> getAllArchived() {
+        List<SendingResponse> sendings = sendingService.getAllArchived();
+        return ResponseEntity.ok(sendings);
     }
 
-    @PutMapping("/{id}/archive")
-    @Operation(summary = "Архивирует отправку", description = "Изменяет статус отправки на 'ARCHIVED'")
+    @PutMapping("/archive/{senderId}")
+    @Operation(summary = "Архивирует отправки", description = "Изменяет статус отправления на 'ARCHIVED'")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Sending archived successfully"),
             @ApiResponse(responseCode = "400", description = "Sending is already archived"),
-            @ApiResponse(responseCode = "404", description = "Sending not found")
+            @ApiResponse(responseCode = "404", description = "Sending not found or does not belong to the user")
     })
-    public ResponseEntity<String> archiveSending(@PathVariable Long id) {
-        return sendingService.archiveSending(id);
+    public ResponseEntity<String> archiveSending(@PathVariable Long senderId) {
+        return sendingService.archiveSending(senderId);
     }
 
-    @PutMapping("/{id}/activate")
-    @Operation(summary = "Активирует отправку", description = "Изменяет статус отправки на 'ACTIVE'")
+    @PutMapping("/activate/{senderId}")
+    @Operation(summary = "Активирует отправки", description = "Изменяет статус отправления на 'ACTIVE'")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Sending activated successfully"),
             @ApiResponse(responseCode = "400", description = "Sending is already active"),
-            @ApiResponse(responseCode = "404", description = "Sending not found")
+            @ApiResponse(responseCode = "404", description = "Sending not found or does not belong to the user")
     })
-    public ResponseEntity<String> activateSending(@PathVariable Long id) {
-        return sendingService.activateSending(id);
+    public ResponseEntity<String> activateSending(@PathVariable Long senderId) {
+        return sendingService.activateSending(senderId);
     }
 }
 

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -36,35 +37,35 @@ public class DeliveryJDBCTemplate {
                 rs.getString("size") != null ? Size.valueOf(rs.getString("size")) : null,
                 rs.getString("phoneNumber"),
                 rs.getString("roleType") != null ? Role.valueOf(rs.getString("roleType")) : null
-        );
+                );
     }
 
     public List<CargoResponse> getAllCargo(String fromWhere, String toWhere, LocalDate dispatchDate, LocalDate arrivalDate,
                                            PackageType packageType, Size size, Role roleType, String email) {
 
         StringBuilder sql = new StringBuilder("""
-        SELECT
-            COALESCE(d.id, s.id) AS id,
-            u.id AS userId,
-            u.user_image AS userImage,
-            CONCAT(u.first_name, ' ', u.last_name) AS fullName,
-            d.transport_number AS transportNumber, -- Только для Delivery
-            COALESCE(d.description, s.description) AS description,
-            COALESCE(d.from_where, s.from_where) AS fromWhere,
-            COALESCE(d.dispatch_date, s.dispatch_date) AS dispatchDate,
-            COALESCE(d.to_where, s.to_where) AS toWhere,
-            COALESCE(d.arrival_date, s.arrival_date) AS arrivalDate,
-            COALESCE(d.package_type, s.package_type) AS packageType,
-            COALESCE(d.size, s.size) AS size,
-            u.phone_number AS phoneNumber,
-            u.role AS roleType
-        FROM users u
-        LEFT JOIN sendings s ON s.user_id = u.id AND ? = 'SENDER'
-        LEFT JOIN deliveries d ON d.user_id = u.id AND ? = 'DELIVERY'
-        WHERE
-            u.role = ? -- Фильтр по роли
-            AND u.email != ? -- Исключаем текущего пользователя
-    """);
+                    SELECT
+                        COALESCE(d.id, s.id) AS id,
+                        u.id AS userId,
+                        u.user_image AS userImage,
+                        CONCAT(u.first_name, ' ', u.last_name) AS fullName,
+                        d.transport_number AS transportNumber, -- Только для Delivery
+                        COALESCE(d.description, s.description) AS description,
+                        COALESCE(d.from_where, s.from_where) AS fromWhere,
+                        COALESCE(d.dispatch_date, s.dispatch_date) AS dispatchDate,
+                        COALESCE(d.to_where, s.to_where) AS toWhere,
+                        COALESCE(d.arrival_date, s.arrival_date) AS arrivalDate,
+                        COALESCE(d.package_type, s.package_type) AS packageType,
+                        COALESCE(d.size, s.size) AS size,
+                        u.phone_number AS phoneNumber,
+                        u.role AS roleType
+                    FROM users u
+                    LEFT JOIN sendings s ON s.user_id = u.id AND ? = 'SENDER'
+                    LEFT JOIN deliveries d ON d.user_id = u.id AND ? = 'DELIVERY'
+                    WHERE
+                        u.role = ? -- Фильтр по роли
+                        AND u.email != ? -- Исключаем текущего пользователя
+                """);
         List<Object> params = new ArrayList<>();
         params.add(roleType.name());
         params.add(roleType.name());
@@ -115,28 +116,48 @@ public class DeliveryJDBCTemplate {
                     d.id AS id,
                     u.id AS userId,
                     u.user_image AS userImage,
-                    concat(u.first_name, ' ', u.last_name) AS fullName,
+                    CONCAT(u.first_name, ' ', u.last_name) AS fullName,
                     d.transport_number AS transportNumber,
                     d.description AS description,
                     d.from_where AS fromWhere,
-                    COALESCE(d.dispatch_date, CURRENT_DATE) AS dispatchDate,  
+                    d.dispatch_date AS dispatchDate,
                     d.to_where AS toWhere,
-                    COALESCE(d.arrival_date, CURRENT_DATE) AS arrivalDate, 
+                    d.arrival_date AS arrivalDate,
                     d.package_type AS packageType,
                     d.size AS size,
                     u.phone_number AS phoneNumber,
                     u.role AS roleType
                 FROM
                     users u
-                    LEFT JOIN deliveries d ON d.user_id = u.id
+                LEFT JOIN deliveries d ON d.user_id = u.id
                 WHERE
-                    u.role = 'DELIVERY'
-                    AND u.id = ? 
+                    d.status = 'ARCHIVED'
+                    AND u.email != ?
+                ORDER BY d.arrival_date DESC
                 """;
         try {
             return jdbcTemplate.queryForObject(sql, this::getAllCargoRs, deliveryById);
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("Доставка с ID " + deliveryById + " не найдена!");
         }
+    }
+
+    public String getDeliveryStatus(Long id) {
+        String sql = "SELECT status FROM deliveries WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, id);
+    }
+
+    public void updateDeliveryStatus(Long id, String status) {
+        String sql = "UPDATE deliveries SET status = ? WHERE id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, status, id);
+        if (rowsAffected == 0) {
+            throw new NotFoundException("Доставка с ID " + id + " не найдена!");
+        }
+    }
+
+    public boolean isDeliveryOwnedByUser(Long deliveryId, Long userId) {
+        String sql = "SELECT COUNT(*) FROM deliveries WHERE id = ? AND user_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, deliveryId, userId);
+        return count == null || count <= 0;
     }
 }

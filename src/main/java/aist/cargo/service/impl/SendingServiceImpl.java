@@ -4,10 +4,13 @@ import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
 import aist.cargo.entity.Sending;
 import aist.cargo.entity.User;
+import aist.cargo.enums.Status;
 import aist.cargo.exception.NotFoundException;
 import aist.cargo.repository.SendingRepository;
 import aist.cargo.repository.UserRepository;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import aist.cargo.service.SendingService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,10 +23,12 @@ public class SendingServiceImpl implements SendingService {
 
     private final UserRepository userRepository;
     private final SendingRepository sendingRepository;
+    private final UserServiceImpl userServiceImpl;
 
-    public SendingServiceImpl(UserRepository userRepository, SendingRepository sendingRepository) {
+    public SendingServiceImpl(UserRepository userRepository, SendingRepository sendingRepository, UserServiceImpl userServiceImpl) {
         this.userRepository = userRepository;
         this.sendingRepository = sendingRepository;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @Override
@@ -108,8 +113,62 @@ public class SendingServiceImpl implements SendingService {
         Sending sending = sendingRepository.findById(sendingId)
                 .orElseThrow(() -> new RuntimeException("Отправка не найдена"));
         sendingRepository.delete(sending);
-
     }
 
+    @Override
+    public ResponseEntity<String> archiveSending(Long senderId) {
+        User user = userServiceImpl.getAuthenticatedUser();
+
+        Sending sending = sendingRepository.findById(senderId)
+                .filter(s -> s.getUser().getId().equals(user.getId()))  // Проверка принадлежности отправления пользователю
+                .orElseThrow(() -> new RuntimeException("Sending not found or does not belong to the user"));
+
+        if (sending.getStatus() == Status.ARCHIVED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sending is already archived.");
+        }
+        sending.setStatus(Status.ARCHIVED);
+        sendingRepository.save(sending);
+
+        return ResponseEntity.ok("Sending archived successfully.");
+    }
+
+    @Override
+    public ResponseEntity<String> activateSending(Long senderId) {
+        User user = userServiceImpl.getAuthenticatedUser();
+
+        Sending sending = sendingRepository.findById(senderId)
+                .filter(s -> s.getUser().getId().equals(user.getId()))  // Проверка принадлежности отправления пользователю
+                .orElseThrow(() -> new RuntimeException("Sending not found or does not belong to the user"));
+
+        if (sending.getStatus() == Status.ACTIVE) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sending is already active.");
+        }
+        sending.setStatus(Status.ACTIVE);
+        sendingRepository.save(sending);
+
+        return ResponseEntity.ok("Sending activated successfully.");
+    }
+
+    @Override
+    public List<SendingResponse> getAllArchived() {
+        User user = userServiceImpl.getAuthenticatedUser();
+
+        return user.getSendings().stream()
+                .filter(sending -> sending.getStatus() == Status.ARCHIVED)
+                .map(sending -> SendingResponse.builder()
+                        .id(sending.getId())
+                        .fullName(sending.getUser().getFullName())
+                        .phoneNumber(sending.getUser().getPhoneNumber())
+                        .description(sending.getDescription())
+                        .fromWhere(sending.getFromWhere())
+                        .toWhere(sending.getToWhere())
+                        .dispatchDate(sending.getDispatchDate())
+                        .arrivalDate(sending.getArrivalDate())
+                        .packageType(sending.getPackageType())
+                        .size(sending.getSize())
+                        .status(sending.getStatus())
+                        .build())
+                .toList();
+    }
 }
 

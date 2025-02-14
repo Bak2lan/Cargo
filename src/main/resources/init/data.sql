@@ -52,14 +52,14 @@ VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Delivery of fragile items', 'Bishkek'
        ('2025-04-15', '2025-04-10', 10, 7, 'Sports Equipment', 'Bishkek', 'LUGGAGE', 'L', 'Naryn', '10KG820TGO', 'TRUCK', 'TRUCK');
 
 
-INSERT INTO sendings (arrival_date, dispatch_date, id, user_id, description, from_where, package_type, size, to_where)
-VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Sending of legal documents', 'Bishkek', 'ENVELOPE', 'S', 'Alma-Ata'),
-       ('2025-02-15', '2025-02-10', 2, 2, 'Sending of office supplies', 'Bishkek', 'BOX', 'M', 'Ozgon'),
-       ('2025-02-20', '2025-02-15', 3, 3, 'Sending of gifts', 'Bishkek', 'LUGGAGE', 'L', 'Osh'),
-       ('2025-02-25', '2025-02-20', 4, 1, 'Sending of electronics', 'Bishkek', 'BOX', 'M', 'Kant'),
-       ('2025-03-10', '2025-03-05', 5, 2, 'Sending of documents', 'Bishkek', 'ENVELOPE', 'S', 'Naryn'),
-       ('2025-03-15', '2025-03-10', 6, 3, 'Sending of supplies', 'Bishkek', 'BOX', 'M', 'Jalal-Abad'),
-       ('2025-03-20', '2025-03-15', 7, 4, 'Sending of gifts', 'Bishkek', 'LUGGAGE', 'L', 'Talas'),
-       ('2025-03-25', '2025-03-20', 8, 5, 'Sending of furniture', 'Bishkek', 'BOX', 'M', 'Balykchy'),
-       ('2025-04-10', '2025-04-05', 9, 6, 'Sending of clothes', 'Bishkek', 'BOX', 'S', 'Issyk-Kul'),
-       ('2025-04-15', '2025-04-10', 10, 7, 'Sending of toys', 'Bishkek', 'BOX', 'M', 'Karakol');
+INSERT INTO sendings (arrival_date, dispatch_date, id, user_id, description, from_where, package_type, size, to_where, status)
+VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Sending of legal documents', 'Bishkek', 'ENVELOPE', 'S', 'Alma-Ata','ACTIVE'),
+       ('2025-02-15', '2025-02-10', 2, 2, 'Sending of office supplies', 'Bishkek', 'BOX', 'M', 'Ozgon','ACTIVE'),
+       ('2025-02-20', '2025-02-15', 3, 3, 'Sending of gifts', 'Bishkek', 'LUGGAGE', 'L', 'Osh', 'ACTIVE'),
+       ('2025-02-25', '2025-02-20', 4, 1, 'Sending of electronics', 'Bishkek', 'BOX', 'M', 'Kant', 'ACTIVE'),
+       ('2025-03-10', '2025-03-05', 5, 2, 'Sending of documents', 'Bishkek', 'ENVELOPE', 'S', 'Naryn', 'ACTIVE'),
+       ('2025-03-15', '2025-03-10', 6, 3, 'Sending of supplies', 'Bishkek', 'BOX', 'M', 'Jalal-Abad', 'ACTIVE'),
+       ('2025-03-20', '2025-03-15', 7, 4, 'Sending of gifts', 'Bishkek', 'LUGGAGE', 'L', 'Talas', 'ARCHIVED'),
+       ('2025-03-25', '2025-03-20', 8, 5, 'Sending of furniture', 'Bishkek', 'BOX', 'M', 'Balykchy', 'ARCHIVED'),
+       ('2025-04-10', '2025-04-05', 9, 6, 'Sending of clothes', 'Bishkek', 'BOX', 'S', 'Issyk-Kul', 'ARCHIVED'),
+       ('2025-04-15', '2025-04-10', 10, 7, 'Sending of toys', 'Bishkek', 'BOX', 'M', 'Karakol', 'ARCHIVED');

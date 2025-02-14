@@ -3,6 +3,9 @@ package aist.cargo.controller;
 import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
 import aist.cargo.service.SendingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +63,33 @@ public class SendingController {
         }
     }
 
+    @GetMapping("/getAllArchived")
+    @Operation(summary = "Все архивированные отправки")
+    public ResponseEntity<List<SendingResponse>> getAllArchived() {
+        List<SendingResponse> sendings = sendingService.getAllArchived();
+        return ResponseEntity.ok(sendings);
+    }
+
+    @PutMapping("/archive/{senderId}")
+    @Operation(summary = "Архивирует отправки", description = "Изменяет статус отправления на 'ARCHIVED'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sending archived successfully"),
+            @ApiResponse(responseCode = "400", description = "Sending is already archived"),
+            @ApiResponse(responseCode = "404", description = "Sending not found or does not belong to the user")
+    })
+    public ResponseEntity<String> archiveSending(@PathVariable Long senderId) {
+        return sendingService.archiveSending(senderId);
+    }
+
+    @PutMapping("/activate/{senderId}")
+    @Operation(summary = "Активирует отправки", description = "Изменяет статус отправления на 'ACTIVE'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sending activated successfully"),
+            @ApiResponse(responseCode = "400", description = "Sending is already active"),
+            @ApiResponse(responseCode = "404", description = "Sending not found or does not belong to the user")
+    })
+    public ResponseEntity<String> activateSending(@PathVariable Long senderId) {
+        return sendingService.activateSending(senderId);
+    }
 }
 

@@ -89,13 +89,13 @@ jobs:
           # Deployment and verification
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
             # Set permissions for new version
-            chmod 755 /opt/trpo-second/new/Cargo-0.0.1-SNAPSHOT.jar
+            chmod 755 /opt/trpo/new/Cargo-0.0.1-SNAPSHOT.jar
             
             # Stop the second service
             sudo systemctl stop test-second.service
             
             # Move new version into place
-            mv /opt/trpo-second/new/Cargo-0.0.1-SNAPSHOT.jar /opt/trpo-second/
+            mv /opt/trpo/new/Cargo-0.0.1-SNAPSHOT.jar /opt/trpo/
             
             # Start the second service
             sudo systemctl start test.service

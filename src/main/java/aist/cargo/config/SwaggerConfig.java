@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,6 +18,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
+            .addServersItem(new Server().url("https://api.aistcargo.kyrgyz-source.com").description("Production Server"))
+            .addServersItem(new Server().url("http://62.171.147.215:8087").description("Local Development Server"))
                 .components(new Components()
                         .addSecuritySchemes(API_KEY, apiKeySecurityScheme()))
                 .info(new Info().title("AistCargo Api").description("Api Documentation for AistCargo"))

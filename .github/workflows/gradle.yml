@@ -1,4 +1,4 @@
-name: Gradle CI/CD - Second Project
+name: Gradle CI/CD
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Build JAR for Second Project
+    name: Build JAR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('/*.gradle*', '/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       
@@ -42,11 +42,11 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: second-project-jar
-          path: build/libs/*.jar
+          name: application-jar
+          path: build/libs/*[!plain].jar  # Excludes plain JARs
 
   deploy:
-    name: Deploy Second Project to Staging
+    name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/master'
@@ -54,7 +54,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: cargo-0.0.1-SNAPSHOT.jar
+          name: application-jar
           path: ./build/libs
       
       - name: List files after download
@@ -69,36 +69,36 @@ jobs:
           # Install sshpass
           sudo apt-get update && sudo apt-get install -y sshpass
           
-          # Create directories for second project
+          # Create backup and new deployment directories
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
-            mkdir -p /opt/trpo-second/backup
-            mkdir -p /opt/trpo-second/new
+            mkdir -p /opt/cargo/backup
+            mkdir -p /opt/cargo/new
           "
           
           # Backup current version if it exists
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
-            if [ -f /opt/trpo-second/cargo-0.0.1-SNAPSHOT.jar ]; then
-              cp /opt/trpo-second/cargo-0.0.1-SNAPSHOT.jar /opt/trpo-second/backup/
+            if [ -f /opt/cargo/cargo-0.0.1-SNAPSHOT.jar ]; then
+              cp /opt/cargo/cargo-0.0.1-SNAPSHOT.jar /opt/cargo/backup/
               echo 'Current version backed up successfully'
             fi
           "
           
-          # Upload new version
-          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./build/libs/cargo-0.0.1-SNAPSHOT.jar $SERVER_USER@$SERVER_HOST:/opt/trpo-second/new/
+          # Upload new version to temporary location
+          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./build/libs/cargo-0.0.1-SNAPSHOT.jar $SERVER_USER@$SERVER_HOST:/opt/cargo/new/
           
           # Deployment and verification
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
             # Set permissions for new version
-            chmod 755 /opt/trpo-second/new/cargo-0.0.1-SNAPSHOT.jar
+            chmod 755 /opt/cargo/new/cargo-0.0.1-SNAPSHOT.jar
             
-            # Stop the second service
-            sudo systemctl stop test-second.service
+            # Stop the service
+            sudo systemctl stop cargo.service
             
             # Move new version into place
-            mv /opt/trpo-second/new/cargo-0.0.1-SNAPSHOT.jar/opt/trpo-second/
+            mv /opt/cargo/new/cargo-0.0.1-SNAPSHOT.jar /opt/cargo/
             
-            # Start the second service
-            sudo systemctl start test-second.service
+            # Start the service
+            sudo systemctl start cargo.service
             
             # Wait for application to start
             echo 'Waiting for application to start...'
@@ -108,5 +108,56 @@ jobs:
             DEPLOYMENT_SUCCESS=true
             
             # Check if service is running
-            if ! systemctl is-active --quiet test-second.service; then
+            if ! systemctl is-active --quiet cargo.service; then
               echo 'Service failed to start'
+              journalctl -u cargo.service -n 50 || echo 'No service logs available'
+              DEPLOYMENT_SUCCESS=false
+            fi
+            
+            # Check if process is listening on port
+            if ! netstat -tulpn | grep :8087; then
+              echo 'Application is not listening on port 8087'
+              journalctl -u cargo.service -n 50 || echo 'No service logs available'
+              DEPLOYMENT_SUCCESS=false
+            fi
+            
+            # Check if application logs show successful startup
+            if ! journalctl -u cargo.service -n 50 | grep -i 'Started .* in .* seconds'; then
+              echo 'Application startup message not found in logs'
+              journalctl -u cargo.service -n 50 || echo 'No service logs available' 
+              DEPLOYMENT_SUCCESS=false
+            fi
+            
+            # If any checks failed, perform rollback
+            if [ \"\$DEPLOYMENT_SUCCESS\" = false ]; then
+              echo 'Deployment verification failed. Rolling back to previous version...'
+              
+              # Stop the failed service
+              sudo systemctl stop cargo.service
+              
+              # Restore backup if it exists
+              if [ -f /opt/cargo/backup/cargo-0.0.1-SNAPSHOT.jar ]; then
+                cp /opt/cargo/backup/cargo-0.0.1-SNAPSHOT.jar /opt/cargo/
+                chmod 755 /opt/cargo/cargo-0.0.1-SNAPSHOT.jar
+                
+                # Start service with previous version
+                sudo systemctl start cargo.service
+                echo 'Rollback completed. Previous version restored.'
+                
+                # Clean up
+                rm -rf /opt/cargo/new
+                exit 1
+              else
+                echo 'No backup available for rollback'
+                exit 1
+              fi
+            fi
+            
+            # If deployment succeeded, clean up
+            echo 'Deployment successful'
+            journalctl -u cargo.service -n 50 || echo 'No service logs available'
+            rm -rf /opt/cargo/new
+            
+            # Keep one previous version in backup
+            echo 'Cleanup completed'
+          "

@@ -77,25 +77,25 @@ jobs:
           
           # Backup current version if it exists
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
-            if [ -f /opt/cargo/cargo-0.0.1-SNAPSHOT.jar ]; then
-              cp /opt/cargo/cargo-0.0.1-SNAPSHOT.jar /opt/cargo/backup/
+            if [ -f /opt/cargo/Cargo-0.0.1-SNAPSHOT.jar ]; then
+              cp /opt/cargo/Cargo-0.0.1-SNAPSHOT.jar /opt/cargo/backup/
               echo 'Current version backed up successfully'
             fi
           "
           
           # Upload new version to temporary location
-          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./build/libs/cargo-0.0.1-SNAPSHOT.jar $SERVER_USER@$SERVER_HOST:/opt/cargo/new/
+          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./build/libs/Cargo-0.0.1-SNAPSHOT.jar $SERVER_USER@$SERVER_HOST:/opt/cargo/new/
           
           # Deployment and verification
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
             # Set permissions for new version
-            chmod 755 /opt/cargo/new/cargo-0.0.1-SNAPSHOT.jar
+            chmod 755 /opt/cargo/new/Cargo-0.0.1-SNAPSHOT.jar
             
             # Stop the service
             sudo systemctl stop cargo.service
             
             # Move new version into place
-            mv /opt/cargo/new/cargo-0.0.1-SNAPSHOT.jar /opt/cargo/
+            mv /opt/cargo/new/Cargo-0.0.1-SNAPSHOT.jar /opt/cargo/
             
             # Start the service
             sudo systemctl start cargo.service
@@ -136,9 +136,9 @@ jobs:
               sudo systemctl stop cargo.service
               
               # Restore backup if it exists
-              if [ -f /opt/cargo/backup/cargo-0.0.1-SNAPSHOT.jar ]; then
-                cp /opt/cargo/backup/cargo-0.0.1-SNAPSHOT.jar /opt/cargo/
-                chmod 755 /opt/cargo/cargo-0.0.1-SNAPSHOT.jar
+              if [ -f /opt/cargo/backup/Cargo-0.0.1-SNAPSHOT.jar ]; then
+                cp /opt/cargo/backup/Cargo-0.0.1-SNAPSHOT.jar /opt/cargo/
+                chmod 755 /opt/cargo/Cargo-0.0.1-SNAPSHOT.jar
                 
                 # Start service with previous version
                 sudo systemctl start cargo.service

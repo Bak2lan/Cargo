@@ -54,7 +54,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: Cargo-0.0.1-SNAPSHOT.jar
+          name: cargo-0.0.1-SNAPSHOT.jar
           path: ./build/libs
       
       - name: List files after download
@@ -77,25 +77,25 @@ jobs:
           
           # Backup current version if it exists
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
-            if [ -f /opt/trpo-second/Cargo-0.0.1-SNAPSHOT.jar ]; then
-              cp /opt/trpo-second/Cargo-0.0.1-SNAPSHOT.jar /opt/trpo-second/backup/
+            if [ -f /opt/trpo-second/cargo-0.0.1-SNAPSHOT.jar ]; then
+              cp /opt/trpo-second/cargo-0.0.1-SNAPSHOT.jar /opt/trpo-second/backup/
               echo 'Current version backed up successfully'
             fi
           "
           
           # Upload new version
-          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./build/libs/Cargo-0.0.1-SNAPSHOT.jar $SERVER_USER@$SERVER_HOST:/opt/trpo-second/new/
+          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./build/libs/cargo-0.0.1-SNAPSHOT.jar $SERVER_USER@$SERVER_HOST:/opt/trpo-second/new/
           
           # Deployment and verification
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
             # Set permissions for new version
-            chmod 755 /opt/trpo-second/new/Cargo-0.0.1-SNAPSHOT.jar
+            chmod 755 /opt/trpo-second/new/cargo-0.0.1-SNAPSHOT.jar
             
             # Stop the second service
             sudo systemctl stop test-second.service
             
             # Move new version into place
-            mv /opt/trpo-second/new/Cargo-0.0.1-SNAPSHOT.jar/opt/trpo-second/
+            mv /opt/trpo-second/new/cargo-0.0.1-SNAPSHOT.jar/opt/trpo-second/
             
             # Start the second service
             sudo systemctl start test-second.service

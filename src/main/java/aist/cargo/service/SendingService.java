@@ -24,5 +24,7 @@ public interface SendingService {
 
 
     List<SendingResponse> getAllArchived();
+
+    List<SendingResponse> getAllSendingsUser();
 }
 

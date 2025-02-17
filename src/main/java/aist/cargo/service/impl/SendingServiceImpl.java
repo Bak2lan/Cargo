@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SendingServiceImpl implements SendingService {
@@ -168,6 +169,29 @@ public class SendingServiceImpl implements SendingService {
                         .size(sending.getSize())
                         .status(sending.getStatus())
                         .build())
+                .toList();
+    }
+
+    @Override
+    public List<SendingResponse> getAllSendingsUser() {
+        User authenticatedUser = userServiceImpl.getAuthenticatedUser();
+        return authenticatedUser.getSendings().stream().map(s -> sendingRepository.findById(s.getId())
+                .map(sending -> SendingResponse.builder()
+                        .id(sending.getId())
+                        .fullName(sending.getUser().getFullName())
+                        .phoneNumber(sending.getUser().getPhoneNumber())
+                        .description(sending.getDescription())
+                        .fromWhere(sending.getFromWhere())
+                        .toWhere(sending.getToWhere())
+                        .dispatchDate(sending.getDispatchDate())
+                        .arrivalDate(sending.getArrivalDate())
+                        .packageType(sending.getPackageType())
+                        .size(sending.getSize())
+                        .status(sending.getStatus())
+                        .build()
+                ).orElse(null)
+        )
+                .filter(Objects::nonNull)
                 .toList();
     }
 }

@@ -30,6 +30,13 @@ public class SendingController {
         return ResponseEntity.ok(sendings);
     }
 
+    @GetMapping("/getAllSendingsUser")
+    @Operation(summary = "get all sendings user")
+    public ResponseEntity<List<SendingResponse>> getAllUserSendings() {
+        List<SendingResponse> sendings = sendingService.getAllSendingsUser();
+        return ResponseEntity.ok(sendings);
+    }
+
     @GetMapping("/get/{id}")
     public ResponseEntity<SendingResponse> getSendingById(@PathVariable Long id) {
         SendingResponse response = sendingService.getSendingById(id);

@@ -1,9 +1,9 @@
 INSERT INTO users (account_verified, date_of_birth, email_confirmed, login_disabled, id, email, first_name, last_name,
                    password, phone_number, role)
-VALUES (TRUE, '1990-01-01', TRUE, FALSE, 1, 'admin@mail.com', 'Admin', 'Admin', '$2y$10$vgBCuSJaZhJQ1KbkpFjQVeBaEkNH8aTKYGMrNoaq3gxgoPUa2t0DG', '1234567890', 'DELIVERY'),
+VALUES (TRUE, '1990-01-01', TRUE, FALSE, 1, 'admin@mail.com', 'Admin', 'Admin', '$2y$10$vgBCuSJaZhJQ1KbkpFjQVeBaEkNH8aTKYGMrNoaq3gxgoPUa2t0DG', '1234567890', 'USER'),
        (TRUE, '1985-05-10', TRUE, FALSE, 2, 'petr@mail.com', 'Petr', 'Asanov', '$2y$10$iWIODU1Jno4o2RVKGhuj.elrrV/iE/CAnTCiGPSRA7B4a8Q32.i8O', '0987654321', 'SENDER'),
        (FALSE, '1995-07-15', FALSE, TRUE, 3, 'anna@mail.com', 'Nur', 'Emilisov', '$2y$10$gIfl2LM3u3aRZRwPNq7JY.VP6Twf3wRK4eGKXX5xMG19JL5bzpPsG', '1122334455', 'DELIVERY'),
-       (TRUE, '1988-12-30', TRUE, FALSE, 4, 'maria@mail.com', 'Marina', 'Egorov', '$2y$10$Sd1YybIh8QlaoS2bDkZb.eUqSWF1elBBmFrg44BB8ceUzw39sjDNu', '6677889900', 'SENDER'),
+       (TRUE, '1988-12-30', TRUE, FALSE, 4, 'maria@mail.com', 'Marina', 'Egorov', '$2y$10$Sd1YybIh8QlaoS2bDkZb.eUqSWF1elBBmFrg44BB8ceUzw39sjDNu', '6677889900', 'USER'),
        (TRUE, '1992-03-20', TRUE, FALSE, 5, 'dmitry@mail.com', 'Dima', 'Kuza', '$2y$10$Z8beRchDWb2netKRtwxXDOS3IUj8GRBCFWVFYl2CAqIXfH/wuuNw2', '2233445566', 'DELIVERY'),
        (TRUE, '1993-04-15', TRUE, FALSE, 6, 'elena@mail.com', 'Elena', 'Vasilieva', '$2y$10$jRt1B9mJOfkrMJzNvsARauUyr4AxAHdoQncxyvVEbhmBiGZ80EYbe', '3456789012', 'SENDER'),
        (FALSE, '1990-06-10', TRUE, TRUE, 7, 'max@mail.com', 'Max', 'Turov', '$2y$10$gYlV4PDhnkKMX5wTvNFNIe7caJS78EuKP2neb1JSzXIA54WcZE6OW', '6789012345', 'DELIVERY'),

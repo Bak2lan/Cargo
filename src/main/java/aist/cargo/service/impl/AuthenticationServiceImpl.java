@@ -4,6 +4,7 @@ import aist.cargo.config.JwtService;
 import aist.cargo.dto.user.*;
 import aist.cargo.entity.OtpCode;
 import aist.cargo.entity.User;
+import aist.cargo.enums.Role;
 import aist.cargo.exception.AlreadyExistException;
 import aist.cargo.exception.BadCredentialException;
 import aist.cargo.exception.NotFoundException;
@@ -50,6 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
+        user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmailConfirmed(false);
         pendingUsers.put(request.getEmail(), user);

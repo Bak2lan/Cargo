@@ -30,11 +30,10 @@ public class SendingController {
         return ResponseEntity.ok(sendings);
     }
 
-    @GetMapping("/getAllSendingsUser")
-    @Operation(summary = "get all sendings user")
-    public ResponseEntity<List<SendingResponse>> getAllUserSendings() {
-        List<SendingResponse> sendings = sendingService.getAllSendingsUser();
-        return ResponseEntity.ok(sendings);
+    @GetMapping("/getAll/sendingsUser")
+    @Operation(summary = "get all sendings user", operationId = "Получить свои посылки")
+    public List<SendingResponse> getAllUserSendings() {
+        return sendingService.getAllSendingsUser();
     }
 
     @GetMapping("/get/{id}")

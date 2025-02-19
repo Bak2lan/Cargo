@@ -6,7 +6,6 @@ import aist.cargo.service.CloudinaryService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.util.Map;
 
@@ -18,6 +17,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         this.cloudinary = config.getCloudinary();
     }
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, Object> uploadFile(String filePath) throws Exception {
         if (filePath == null || filePath.isBlank()) {
             throw new BadRequestException("Path to file cannot be empty.");
@@ -48,6 +48,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getFileDetails(String publicId) throws Exception {
         if (publicId == null || publicId.isBlank()) {
             throw new BadRequestException("id can not be empty or null.");
@@ -56,6 +57,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, Object> deleteFile(String publicId) throws Exception {
         if (publicId == null || publicId.isBlank()) {
             throw new BadRequestException("id can not be empty or null.");

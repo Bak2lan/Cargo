@@ -26,5 +26,7 @@ public interface SendingService {
     List<SendingResponse> getAllArchived();
 
     List<SendingResponse> getAllSendingsUser();
+
+    String createSending(SendingRequest sendingRequest, String userEmail);
 }
 

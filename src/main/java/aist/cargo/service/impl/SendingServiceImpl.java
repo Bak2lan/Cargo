@@ -9,12 +9,16 @@ import aist.cargo.exception.NotFoundException;
 import aist.cargo.repository.SendingRepository;
 import aist.cargo.repository.UserRepository;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
 import aist.cargo.service.SendingService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +29,7 @@ public class SendingServiceImpl implements SendingService {
     private final UserRepository userRepository;
     private final SendingRepository sendingRepository;
     private final UserServiceImpl userServiceImpl;
+    private static final Logger log = LoggerFactory.getLogger(Sending.class);
 
     public SendingServiceImpl(UserRepository userRepository, SendingRepository sendingRepository, UserServiceImpl userServiceImpl) {
         this.userRepository = userRepository;
@@ -193,6 +198,72 @@ public class SendingServiceImpl implements SendingService {
                         .status(sending.getStatus())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public String createSending(SendingRequest sendingRequest, String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + userEmail));
+
+        if (!userRepository.existsSubscriptionsByUserEmail(userEmail)) {
+            return "No subscription found for the user with email: " + userEmail;
+        }
+
+        String fromWhere = sendingRequest.getFromWhere();
+        String toWhere = sendingRequest.getToWhere();
+
+        if (isAddressValid(fromWhere)) {
+            throw new NotFoundException("Адрес отправления не найден или недействителен: " + fromWhere);
+        }
+        if (isAddressValid(toWhere)) {
+            throw new NotFoundException("Адрес назначения не найден или недействителен: " + toWhere);
+        }
+
+        Sending sending = mapToSending(sendingRequest, user);
+        user.getSendings().add(sending);
+        sendingRepository.save(sending);
+        userRepository.save(user);
+
+        return user.getId().toString();
+    }
+
+    public boolean isAddressValid(String address) {
+        if (address == null || address.trim().isEmpty()) {
+            return true;
+        }
+
+        String url = "https://nominatim.openstreetmap.org/search?q=" + address + "&format=json&addressdetails=1";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent", "CargoApp/1.0 (zoomaisenbaev269@gmail.com)");
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.GET, entity, String.class);
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                return true;
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode node = objectMapper.readTree(response.getBody());
+            return node.isEmpty();
+        } catch (Exception e) {
+            log.error("Error validating address: {}", e.getMessage());
+            return true;
+        }
+    }
+
+    public Sending mapToSending(SendingRequest sendingRequest, User user) {
+        Sending sending = new Sending();
+        sending.setFromWhere(sendingRequest.getFromWhere());
+        sending.setToWhere(sendingRequest.getToWhere());
+        sending.setDispatchDate(sendingRequest.getDispatchDate());
+        sending.setArrivalDate(sendingRequest.getArrivalDate());
+        sending.setDescription(sendingRequest.getDescription());
+        sending.setPackageType(sendingRequest.getPackageType());
+        sending.setSize(sendingRequest.getSize());
+        sending.setUser(user);
+        return sending;
     }
 }
 

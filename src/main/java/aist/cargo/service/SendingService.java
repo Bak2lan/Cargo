@@ -1,14 +1,14 @@
 package aist.cargo.service;
-
 import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
+import aist.cargo.dto.user.SimpleResponseCreate;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface SendingService {
 
-    boolean createSending(SendingRequest sendingRequest);
+    SimpleResponseCreate createSending(SendingRequest sendingRequest);
 
     List<SendingResponse> getAllSendings();
 
@@ -27,6 +27,6 @@ public interface SendingService {
 
     List<SendingResponse> getAllSendingsUser();
 
-    String createSending(SendingRequest sendingRequest, String userEmail);
+        SimpleResponseCreate createSending(SendingRequest sendingRequest, String userEmail);
 }
 

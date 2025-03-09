@@ -2,6 +2,7 @@ package aist.cargo.service.impl;
 
 import aist.cargo.dto.user.SimpleResponse;
 import aist.cargo.dto.user.UserRequest;
+import aist.cargo.dto.user.UserRequestProfile;
 import aist.cargo.dto.user.UserResponse;
 import aist.cargo.entity.*;
 import aist.cargo.exception.NotFoundException;
@@ -46,21 +47,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(Long id, UserRequest userRequest) {
-        Optional<User> existingUser = userRepository.findById(id);
-        if (existingUser.isPresent()) {
-            User updatedUser = existingUser.get();
+    public UserResponse updateUser(Long id, UserRequestProfile userRequest) {
+        User updatedUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
             updatedUser.setFirstName(userRequest.getFirstName());
             updatedUser.setLastName(userRequest.getLastName());
             updatedUser.setEmail(userRequest.getEmail());
-            updatedUser.setPassword(userRequest.getPassword());
             updatedUser.setPhoneNumber(userRequest.getPhoneNumber());
             updatedUser.setDateOfBirth(userRequest.getDateOfBirth());
-            updatedUser.setRole(userRequest.getRole());
-            return userRepository.save(updatedUser);
-        } else {
-            throw new RuntimeException("User not found with ID: " + id);
-        }
+            updatedUser.setId(updatedUser.getId());
+            userRepository.save(updatedUser);
+            return UserResponse.builder()
+                    .image(userRequest.getImage())
+                    .firstName(userRequest.getFirstName())
+                    .lastName(userRequest.getLastName())
+                    .dateOfBirth(userRequest.getDateOfBirth())
+                    .phoneNumber(userRequest.getPhoneNumber())
+                    .email(userRequest.getEmail())
+                    .id(updatedUser.getId()).build();
     }
 
     @Override

@@ -3,6 +3,7 @@ package aist.cargo.controller;
 import aist.cargo.dto.user.CargoResponse;
 import aist.cargo.dto.user.DeliveryRequest;
 import aist.cargo.dto.user.SearchRequest;
+import aist.cargo.dto.user.SimpleResponseCreate;
 import aist.cargo.service.DeliveryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class DeliveryController {
     }
 
     @PostMapping("create/Delivery")
-    public String createDelivery(@RequestBody DeliveryRequest deliveryRequest, Principal principal) {
+    public SimpleResponseCreate createDelivery(@RequestBody DeliveryRequest deliveryRequest, Principal principal) {
         return deliveryService.createDelivery(deliveryRequest, principal.getName());
 
     }

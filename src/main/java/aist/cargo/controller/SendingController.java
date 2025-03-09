@@ -1,7 +1,7 @@
 package aist.cargo.controller;
-
 import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
+import aist.cargo.dto.user.SimpleResponseCreate;
 import aist.cargo.service.SendingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -42,10 +41,8 @@ public class SendingController {
         return ResponseEntity.ok(response);
     }
 
-    // Создание новой отправки
     @PostMapping("/create/{id}")
-    public boolean createSending(@RequestBody SendingRequest request) {
-
+    public SimpleResponseCreate createSending(@RequestBody SendingRequest request) {
         return sendingService.createSending(request);
     }
 
@@ -97,5 +94,12 @@ public class SendingController {
     public ResponseEntity<String> activateSending(@PathVariable Long senderId) {
         return sendingService.activateSending(senderId);
     }
+
+    @PostMapping("CreateAll")
+    @Operation(summary = "Создание отправки", description = "Этот эндпойнт позволяет создать отправку, передавая данные в теле запроса.")
+    public SimpleResponseCreate createSendingAll(@RequestBody SendingRequest sendingRequest) {
+        return sendingService.createSending(sendingRequest);
+    }
+
 }
 

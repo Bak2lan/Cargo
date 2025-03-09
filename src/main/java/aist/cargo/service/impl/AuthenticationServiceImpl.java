@@ -59,6 +59,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("User successfully saved with the identifier: " + user.getEmail());
         String token = jwtService.generateToken(user);
         return new SignUpResponse(
+                user.getId(),
                 token,
                 user.getEmail(),
                 "Код отправлен на " + user.getEmail()
@@ -81,6 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     new UsernamePasswordAuthenticationToken(
                             signInRequest.email(),
                             signInRequest.password()));
+
             String token = jwtService.generateToken(user);
             return SignInResponse.builder()
                     .id(user.getId())

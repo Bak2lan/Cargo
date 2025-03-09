@@ -1,5 +1,4 @@
 package aist.cargo.controller;
-
 import aist.cargo.dto.user.*;
 import aist.cargo.entity.User;
 import aist.cargo.service.UserService;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -59,8 +57,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) {
-        return ResponseEntity.ok(userCrudService.updateUser(id, userRequest));
+    public UserResponse updateUser(@PathVariable Long id, @RequestBody UserRequestProfile userRequest) {
+        return(userCrudService.updateUser(id, userRequest));
     }
 
     @Operation(summary = "Delete user", description = "Delete a user by their ID")

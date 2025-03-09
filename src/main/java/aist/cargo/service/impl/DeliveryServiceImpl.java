@@ -1,8 +1,6 @@
 package aist.cargo.service.impl;
 
-import aist.cargo.dto.user.CargoResponse;
-import aist.cargo.dto.user.DeliveryRequest;
-import aist.cargo.dto.user.SearchRequest;
+import aist.cargo.dto.user.*;
 import aist.cargo.entity.Delivery;
 import aist.cargo.entity.User;
 import aist.cargo.enums.Status;
@@ -53,7 +51,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         );
     }
 
-    public String createDelivery(DeliveryRequest deliveryRequest, String userEmail) {
+    public SimpleResponseCreate createDelivery(DeliveryRequest deliveryRequest, String userEmail) {
         User user = userRepository.getUserByEmail(userEmail).orElseThrow(
                 () -> new NotFoundException("User not found email " + userEmail));
 
@@ -69,21 +67,20 @@ public class DeliveryServiceImpl implements DeliveryService {
 
             if (!fromWhereExists && isAddressValid(fromWhere)) {
                 log.info("test3");
-                throw new NotFoundException("Адрес отправления не найден: " + fromWhere);
+                return new SimpleResponseCreate("Адрес отправления не найден: " + fromWhere, false);
             }
             log.info("test4");
             if (!toWhereExists && isAddressValid(toWhere)) {
-                throw new NotFoundException("Адрес назначения не найден: " + toWhere);
+                return new SimpleResponseCreate("Адрес назначения не найден: " + toWhere, false);
             }
             log.info("test5");
 
             user.getDeliveries().add(mapToDelivery(deliveryRequest, user));
             userRepository.save(user);
 
-            return user.getId().toString();
+            return new SimpleResponseCreate("Delivery created successfully. User ID: " + user.getId(), true);
         } else {
-
-            return "No subscription found for the user with email:" + userEmail;
+            return new SimpleResponseCreate("No subscription found for the user with email: " + userEmail, false);
         }
     }
 

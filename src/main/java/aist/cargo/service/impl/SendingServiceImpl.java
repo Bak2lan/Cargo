@@ -2,6 +2,7 @@ package aist.cargo.service.impl;
 
 import aist.cargo.dto.user.SendingRequest;
 import aist.cargo.dto.user.SendingResponse;
+import aist.cargo.dto.user.SimpleResponseCreate;
 import aist.cargo.entity.Sending;
 import aist.cargo.entity.User;
 import aist.cargo.enums.Status;
@@ -38,13 +39,14 @@ public class SendingServiceImpl implements SendingService {
     }
 
     @Override
-    public boolean createSending(SendingRequest sendingRequest) {
+    public SimpleResponseCreate createSending(SendingRequest sendingRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        User user = userRepository.getUserByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+        User user = userRepository.getUserByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!user.hasActiveSubscriptionForPackage(sendingRequest.getPackageType())) {
-            return false;
+            return new SimpleResponseCreate("User does not have an active subscription for this package type.", false);
         }
 
         Sending sending = new Sending();
@@ -58,8 +60,9 @@ public class SendingServiceImpl implements SendingService {
         sending.setArrivalDate(sendingRequest.getArrivalDate());
 
         sendingRepository.save(sending);
-        return true;
+        return new SimpleResponseCreate("Sending created successfully.", true);
     }
+
 
     @Override
     public List<SendingResponse> getAllSendings() {
@@ -200,12 +203,13 @@ public class SendingServiceImpl implements SendingService {
                 .collect(Collectors.toList());
     }
 
-    public String createSending(SendingRequest sendingRequest, String userEmail) {
+    @Override
+    public SimpleResponseCreate createSending(SendingRequest sendingRequest, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new NotFoundException("User not found with email: " + userEmail));
 
         if (!userRepository.existsSubscriptionsByUserEmail(userEmail)) {
-            return "No subscription found for the user with email: " + userEmail;
+            return new SimpleResponseCreate("No subscription found for the user with email: " + userEmail,false);
         }
 
         String fromWhere = sendingRequest.getFromWhere();
@@ -223,7 +227,7 @@ public class SendingServiceImpl implements SendingService {
         sendingRepository.save(sending);
         userRepository.save(user);
 
-        return user.getId().toString();
+        return new SimpleResponseCreate("Sending created successfully. ID: " + sending.getId(),true);
     }
 
     public boolean isAddressValid(String address) {

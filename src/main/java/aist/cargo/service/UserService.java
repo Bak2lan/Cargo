@@ -1,5 +1,4 @@
 package aist.cargo.service;
-
 import aist.cargo.dto.user.SimpleResponse;
 import aist.cargo.dto.user.UserRequest;
 import aist.cargo.dto.user.UserRequestProfile;

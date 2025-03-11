@@ -11,7 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SignUpRequest {
-    private Long id;
     @NotBlank(message = "Имя не должно быть пустым!")
     private String firstName;
     @NotBlank(message = "Фамилия не должна быть пустой!")

@@ -41,23 +41,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final ConcurrentHashMap<String, User> pendingUsers = new ConcurrentHashMap<>();
 
 
-    @Override
     public SignUpResponse signUp(SignUpRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new AlreadyExistException("Пользователь с адресом электронной почты:"
-                    + request.getEmail() + " уже существует");
+            log.warn("User already exists with email: {}", request.getEmail());
+            throw new AlreadyExistException("Пользователь с адресом электронной почты: " + request.getEmail() + " уже существует");
         }
+
         User user = new User();
+        user.setId(request.getId());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmailConfirmed(false);
-        pendingUsers.put(request.getEmail(), user);
-        sendOtpToEmail(request.getEmail());
-        log.info("User successfully saved with the identifier: " + user.getEmail());
+
+        user = userRepository.save(user);
+        userRepository.flush(); // Дароо базага сактоо үчүн
+
+        if (user.getId() == null) {
+            log.error("Failed to save user: {}", user);
+            throw new RuntimeException("User was not saved to the database!");
+        }
+
+        log.info("User successfully saved with ID: {}", user.getId());
+
+        sendOtpToEmail(user.getEmail());
+
         String token = jwtService.generateToken(user);
+
         return new SignUpResponse(
                 user.getId(),
                 token,
@@ -66,7 +78,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
     }
 
-        @Override
+
+    @Override
         public SignInResponse signIn (SignInRequest signInRequest){
             User user = userRepository.getUserByEmail(signInRequest.email()).orElseThrow(() ->
                     new NotFoundException(String.format("Пользователь с адресом электронной почты: %s не найден!", signInRequest.email())));

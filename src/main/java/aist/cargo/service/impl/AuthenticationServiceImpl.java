@@ -3,6 +3,7 @@ package aist.cargo.service.impl;
 import aist.cargo.config.JwtService;
 import aist.cargo.dto.user.*;
 import aist.cargo.entity.OtpCode;
+import aist.cargo.entity.Sending;
 import aist.cargo.entity.User;
 import aist.cargo.enums.Role;
 import aist.cargo.exception.AlreadyExistException;
@@ -12,8 +13,11 @@ import aist.cargo.repository.OtpCodeRepository;
 import aist.cargo.repository.UserRepository;
 import aist.cargo.service.AuthenticationService;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -29,7 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Getter
+@Setter
 @Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
@@ -39,14 +44,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final OtpCodeRepository otpCodeRepository;
     private final JavaMailSenderImpl mailSender;
     private final ConcurrentHashMap<String, User> pendingUsers = new ConcurrentHashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(Sending.class);
 
 
     public SignUpResponse signUp(SignUpRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            log.warn("User already exists with email: {}", request.getEmail());
-            throw new AlreadyExistException("Пользователь с адресом электронной почты: " + request.getEmail() + " уже существует");
+            throw new AlreadyExistException("Пользователь с адресом электронной почты:"
+                    + request.getEmail() + " уже существует");
         }
-
         User user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -54,23 +59,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmailConfirmed(false);
-
-        user = userRepository.save(user);
-        userRepository.flush(); // Дароо базага сактоо үчүн
-
-        if (user.getId() == null) {
-            log.error("Failed to save user: {}", user);
-            throw new RuntimeException("User was not saved to the database!");
-        }
-
-        log.info("User successfully saved with ID: {}", user.getId());
-
-        sendOtpToEmail(user.getEmail());
-
+        pendingUsers.put(request.getEmail(), user);
+        sendOtpToEmail(request.getEmail());
+        log.info("User successfully saved with the identifier: " + user.getEmail());
         String token = jwtService.generateToken(user);
-
         return new SignUpResponse(
-                user.getId(),
                 token,
                 user.getEmail(),
                 "Код отправлен на " + user.getEmail()
@@ -134,7 +127,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         pendingUsers.remove(otpCode.getEmail());
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
-                .message("Email успешно подтверждён.")
+                .message("Email успешно подтверждён."+"   ID: "+user.getId())
                 .build();
     }
 
@@ -145,14 +138,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void sendOtpToEmail(String email) {
         String otp = generateOtp();
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5);
-        log.info("Generated OTP: {} for email: {}", otp, email);
+
+        log.info("Generated OTP: " + otp + " for email: " + email);
+
         otpCodeRepository.deleteByEmail(email);
+
         OtpCode otpCode = new OtpCode();
         otpCode.setEmail(email);
         otpCode.setCode(otp);
         otpCode.setExpiresAt(expirationTime);
         otpCodeRepository.save(otpCode);
-        log.info("Saved OTP: {} for email: {}", otp, email);
+
+        log.info("Saved OTP: " + otp + " for email: " + email);
+
         sendEmail(email, otp);
     }
 
@@ -161,13 +159,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         message.setTo(email);
         message.setSubject("Ваш код подтверждения");
         message.setText("Ваш код подтверждения: " + otp + "\nКод действует 5 минут.");
-        mailSender.send(message);
+
+        try {
+            mailSender.send(message);
+            log.info("OTP sent successfully to: " + email);
+        } catch (Exception e) {
+            log.error("Failed to send OTP to: {} due to: {}", email, e.getMessage());
+        }
     }
 
+    // Жылдык өчүрүү: expired OTP коддорду тазалоо
     @Scheduled(cron = "0 */5 * * * *")
     public void deleteExpiredOtpCodes() {
         LocalDateTime now = LocalDateTime.now();
         otpCodeRepository.deleteByExpiresAtBefore(now);
-        System.out.println("Expired OTP codes deleted at: " + now);
+        log.info("Expired OTP codes deleted at: " + now);
     }
 }

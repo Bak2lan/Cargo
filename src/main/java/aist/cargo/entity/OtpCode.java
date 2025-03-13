@@ -16,4 +16,14 @@ public class OtpCode {
     private String email;
     private String code;
     private LocalDateTime expiresAt;
+
+    public OtpCode(String email, String code, LocalDateTime expiresAt) {
+        this.email = email;
+        this.code = code;
+        this.expiresAt = expiresAt;
+    }
+
+    public OtpCode() {
+
+    }
 }

@@ -26,10 +26,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.security.CryptoPrimitive.SECURE_RANDOM;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JavaMailSenderImpl mailSender;
     private final ConcurrentHashMap<String, User> pendingUsers = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(Sending.class);
-
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     public SignUpResponse signUp(SignUpRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -97,63 +102,61 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build();
         }
 
-    @Override
+    @Transactional
     public SimpleResponse confirmEmail(String code) {
-        Optional<OtpCode> otpOptional = otpCodeRepository.findOtpCodesByCode(code);
-        if (!otpOptional.isPresent()) {
-            return SimpleResponse.builder()
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .message("Недействительный или истёкший OTP-код.")
-                    .build();
-        }
-        OtpCode otpCode = otpOptional.get();
+        OtpCode otpCode = otpCodeRepository.findOtpCodesByCode(code)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Жараксыз же мөөнөтү бүткөн OTP-код."));
+
         if (otpCode.getExpiresAt().isBefore(LocalDateTime.now())) {
+            otpCodeRepository.delete(otpCode);
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.BAD_REQUEST)
-                    .message("OTP-код истёк. Запросите новый.")
+                    .message("OTP-коддун мөөнөтү бүткөн. Жаңы код сураныңыз.")
                     .build();
         }
+
         User user = pendingUsers.get(otpCode.getEmail());
         if (user == null) {
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.NOT_FOUND)
-                    .message("Пользователь не найден.")
+                    .message("Колдонуучу табылган жок.")
                     .build();
         }
+
         user.setAccountVerified(true);
         user.setEmailConfirmed(true);
         userRepository.save(user);
         otpCodeRepository.delete(otpCode);
         pendingUsers.remove(otpCode.getEmail());
+
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
-                .message("Email успешно подтверждён.")
+                .message("Email ийгиликтүү тастыкталды. ID: " + user.getId())
                 .build();
     }
 
     public String generateOtp() {
-        return String.format("%04d", new Random().nextInt(10000));
+        return String.format("%04d", SECURE_RANDOM.nextInt(10000));
     }
 
     public void sendOtpToEmail(String email) {
         String otp = generateOtp();
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5);
         log.info("Generated OTP: {} for email: {}", otp, email);
+
         otpCodeRepository.deleteByEmail(email);
-        OtpCode otpCode = new OtpCode();
-        otpCode.setEmail(email);
-        otpCode.setCode(otp);
-        otpCode.setExpiresAt(expirationTime);
+        OtpCode otpCode = new OtpCode(email, otp, expirationTime);
         otpCodeRepository.save(otpCode);
         log.info("Saved OTP: {} for email: {}", otp, email);
+
         sendEmail(email, otp);
     }
 
     private void sendEmail(String email, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setSubject("Ваш код подтверждения");
-        message.setText("Ваш код подтверждения: " + otp + "\nКод действует 5 минут.");
+        message.setSubject("Сиздин тастыктоо кодуңуз");
+        message.setText("Сиздин OTP-кодуңуз: " + otp + "\nКод 5 мүнөттүн ичинде жарактуу.");
         mailSender.send(message);
     }
 
@@ -161,6 +164,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void deleteExpiredOtpCodes() {
         LocalDateTime now = LocalDateTime.now();
         otpCodeRepository.deleteByExpiresAtBefore(now);
-        System.out.println("Expired OTP codes deleted at: " + now);
-    }
-}
+        log.info("Эскирген OTP-коддор өчүрүлдү: {}", now);
+
+    }}

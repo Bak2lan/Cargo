@@ -127,7 +127,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         pendingUsers.remove(otpCode.getEmail());
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
-                .message("Email успешно подтверждён.")
+                .message("Email успешно подтверждён."+"    id"+user.getId())
                 .build();
     }
 

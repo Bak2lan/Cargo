@@ -98,24 +98,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
     @Override
-    public SimpleResponse confirmEmail(String code) {
+    public SimpleLongResponse confirmEmail(String code) {
         Optional<OtpCode> otpOptional = otpCodeRepository.findOtpCodesByCode(code);
         if (!otpOptional.isPresent()) {
-            return SimpleResponse.builder()
+            return SimpleLongResponse.builder()
                     .httpStatus(HttpStatus.BAD_REQUEST)
                     .message("Недействительный или истёкший OTP-код.")
                     .build();
         }
         OtpCode otpCode = otpOptional.get();
         if (otpCode.getExpiresAt().isBefore(LocalDateTime.now())) {
-            return SimpleResponse.builder()
+            return SimpleLongResponse.builder()
                     .httpStatus(HttpStatus.BAD_REQUEST)
                     .message("OTP-код истёк. Запросите новый.")
                     .build();
         }
         User user = pendingUsers.get(otpCode.getEmail());
         if (user == null) {
-            return SimpleResponse.builder()
+            return SimpleLongResponse.builder()
                     .httpStatus(HttpStatus.NOT_FOUND)
                     .message("Пользователь не найден.")
                     .build();
@@ -125,9 +125,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
         otpCodeRepository.delete(otpCode);
         pendingUsers.remove(otpCode.getEmail());
-        return SimpleResponse.builder()
+        return SimpleLongResponse.builder()
                 .httpStatus(HttpStatus.OK)
-                .message("Email успешно подтверждён."+"    id"+user.getId())
+                .message("Email успешно подтверждён.")
+                .id(user.getId())
                 .build();
     }
 

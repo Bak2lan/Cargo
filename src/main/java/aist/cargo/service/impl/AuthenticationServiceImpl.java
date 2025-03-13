@@ -127,7 +127,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         pendingUsers.remove(otpCode.getEmail());
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
-                .message("Email успешно подтверждён."+"   ID: "+user.getId())
+                .message("Email успешно подтверждён.")
                 .build();
     }
 
@@ -138,19 +138,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void sendOtpToEmail(String email) {
         String otp = generateOtp();
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5);
-
-        log.info("Generated OTP: " + otp + " for email: " + email);
-
+        log.info("Generated OTP: {} for email: {}", otp, email);
         otpCodeRepository.deleteByEmail(email);
-
         OtpCode otpCode = new OtpCode();
         otpCode.setEmail(email);
         otpCode.setCode(otp);
         otpCode.setExpiresAt(expirationTime);
         otpCodeRepository.save(otpCode);
-
-        log.info("Saved OTP: " + otp + " for email: " + email);
-
+        log.info("Saved OTP: {} for email: {}", otp, email);
         sendEmail(email, otp);
     }
 
@@ -159,20 +154,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         message.setTo(email);
         message.setSubject("Ваш код подтверждения");
         message.setText("Ваш код подтверждения: " + otp + "\nКод действует 5 минут.");
-
-        try {
-            mailSender.send(message);
-            log.info("OTP sent successfully to: " + email);
-        } catch (Exception e) {
-            log.error("Failed to send OTP to: {} due to: {}", email, e.getMessage());
-        }
+        mailSender.send(message);
     }
 
-    // Жылдык өчүрүү: expired OTP коддорду тазалоо
     @Scheduled(cron = "0 */5 * * * *")
     public void deleteExpiredOtpCodes() {
         LocalDateTime now = LocalDateTime.now();
         otpCodeRepository.deleteByExpiresAtBefore(now);
-        log.info("Expired OTP codes deleted at: " + now);
+        System.out.println("Expired OTP codes deleted at: " + now);
     }
 }

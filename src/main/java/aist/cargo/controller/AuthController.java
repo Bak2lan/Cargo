@@ -1,15 +1,10 @@
 package aist.cargo.controller;
-
 import aist.cargo.dto.user.*;
 import aist.cargo.service.AuthenticationService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -24,7 +19,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public SimpleResponse verifyOtp(@RequestBody VerifyOtpRequest request) {
+    public SimpleLongResponse verifyOtp(@RequestBody VerifyOtpRequest request) {
         return authenticationService.confirmEmail(request.getCode());
 
     }

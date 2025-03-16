@@ -1,4 +1,5 @@
 package aist.cargo.controller;
+import aist.cargo.dto.user.SubscriptionCreateResponse;
 import aist.cargo.dto.user.SubscriptionRequest;
 import aist.cargo.dto.user.SubscriptionResponse;
 import aist.cargo.entity.Subscription;
@@ -20,14 +21,13 @@ public class SubscriptionController {
 
     @PostMapping
     @Operation(summary = "Create a subscription", description = "Creates a new subscription for a user")
-    public ResponseEntity<SubscriptionResponse> createSubscription(@RequestBody SubscriptionRequest request) {
-        Subscription subscription = subscriptionService.createSubscription(
-                request.getUserId(),
+    public ResponseEntity<SubscriptionCreateResponse> createSubscription(@RequestBody SubscriptionRequest request) {
+        SubscriptionCreateResponse response = subscriptionService.createSubscription(
                 request.getPrice(),
                 request.getTransportType(),
                 request.getDuration()
         );
-        return ResponseEntity.ok(mapToResponse(subscription));
+        return ResponseEntity.ok(response);
     }
     @GetMapping("/{id}")
     @Operation(summary = "Get subscription by ID", description = "Retrieve subscription details by its ID")

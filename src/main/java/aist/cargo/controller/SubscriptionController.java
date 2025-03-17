@@ -6,10 +6,10 @@ import aist.cargo.entity.Subscription;
 import aist.cargo.enums.SubsDuration;
 import aist.cargo.service.SubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,17 +18,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
-
     @PostMapping
-    @Operation(summary = "Create a subscription", description = "Creates a new subscription for a user")
-    public ResponseEntity<SubscriptionCreateResponse> createSubscription(@RequestBody SubscriptionRequest request) {
-        SubscriptionCreateResponse response = subscriptionService.createSubscription(
-                request.getPrice(),
-                request.getTransportType(),
-                request.getDuration()
-        );
-        return ResponseEntity.ok(response);
+    @Operation(summary = "Жазылуу түзүү", description = "Жазылуунун узактыгы, мүмкүн болгон маанилер: ONE_MONTH (1 ай, 99 руб), THREE_MONTH (3 ай, 999 руб), SIX_MONTH (6 ай, 1499 руб), TWELVE_MONTH (12 ай, 1999 руб)       " +
+            "   AIRPLANE, CAR, TRUCK")
+    public SubscriptionCreateResponse createSubscription(
+            @RequestBody @Parameter(description = "Жазылуунун узактыгы, мүмкүн болгон маанилер: ONE_MONTH (1 ай, 99 руб), THREE_MONTH (3 ай, 999 руб), SIX_MONTH (6 ай, 1499 руб), TWELVE_MONTH (12 ай, 1999 руб)")
+            SubscriptionRequest request) {
+        return subscriptionService.createSubscription(request);
     }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get subscription by ID", description = "Retrieve subscription details by its ID")
     public ResponseEntity<SubscriptionResponse> getSubscriptionById(@PathVariable Long id) {

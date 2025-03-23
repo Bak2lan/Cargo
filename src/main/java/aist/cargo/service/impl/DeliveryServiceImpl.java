@@ -16,10 +16,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -51,39 +54,35 @@ public class DeliveryServiceImpl implements DeliveryService {
         );
     }
 
-    public SimpleResponseCreate createDelivery(DeliveryRequest deliveryRequest, String userEmail) {
+    public SimpleResponseCreate TrueDelivery(DeliveryForRequest deliveryRequest, String userEmail) {
         User user = userRepository.getUserByEmail(userEmail).orElseThrow(
                 () -> new NotFoundException("User not found email " + userEmail));
 
-        if (userRepository.existsSubscriptionsByUserEmail(userEmail)) {
-
-            String fromWhere = deliveryRequest.getFromWhere();
-            String toWhere = deliveryRequest.getToWhere();
-            log.info("test1");
-
-            boolean fromWhereExists = deliveryRepository.getSenderByFromWhere(fromWhere).contains(fromWhere);
-            boolean toWhereExists = deliveryRepository.getSenderByToWhere(toWhere).contains(toWhere);
-            log.info("test2");
-
-            if (!fromWhereExists && isAddressValid(fromWhere)) {
-                log.info("test3");
-                return new SimpleResponseCreate("Адрес отправления не найден: " + fromWhere, false);
-            }
-            log.info("test4");
-            if (!toWhereExists && isAddressValid(toWhere)) {
-                return new SimpleResponseCreate("Адрес назначения не найден: " + toWhere, false);
-            }
-            log.info("test5");
-
-            user.getDeliveries().add(mapToDelivery(deliveryRequest, user));
-            userRepository.save(user);
-
-            return new SimpleResponseCreate("Delivery created successfully. User ID: " + user.getId(), true);
-        } else {
+        if (!userRepository.existsSubscriptionsByUserEmail(userEmail)) {
             return new SimpleResponseCreate("No subscription found for the user with email: " + userEmail, false);
         }
-    }
 
+        String fromWhere = deliveryRequest.getFromWhere();
+        String toWhere = deliveryRequest.getToWhere();
+        log.info("Checking addresses...");
+
+        boolean fromWhereExists = deliveryRepository.getSenderByFromWhere(fromWhere).contains(fromWhere);
+        boolean toWhereExists = deliveryRepository.getSenderByToWhere(toWhere).contains(toWhere);
+
+        if (!fromWhereExists && isAddressValid(fromWhere)) {
+            log.info("Sender address invalid");
+            return new SimpleResponseCreate("Адрес отправления не найден: " + fromWhere, false);
+        }
+
+        if (!toWhereExists && isAddressValid(toWhere)) {
+            log.info("Receiver address invalid");
+            return new SimpleResponseCreate("Адрес назначения не найден: " + toWhere, false);
+        }
+
+        log.info("All checks passed");
+
+        return new SimpleResponseCreate("Delivery details are valid.", true);
+    }
     public boolean isAddressValid(String address) {
 
         try {
@@ -108,24 +107,91 @@ public class DeliveryServiceImpl implements DeliveryService {
         }
     }
 
-    public Delivery mapToDelivery(DeliveryRequest deliveryRequest, User user) {
+    @Override
+    public SimpleResponseCreateDelivery createDelivery(DeliveryUpdateRequest deliveryRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return SimpleResponseCreateDelivery.builder()
+                    .message("Unauthorized")
+                    .success(false)
+                    .userId(null)
+                    .id(null)
+                    .random(0)
+                    .build();
+        }
+
+        String userEmail = authentication.getName();
+        User user = userRepository.getUserByEmail(userEmail).orElseThrow(
+                () -> new NotFoundException("User not found with email: " + userEmail)
+        );
+
+        if (!userRepository.existsSubscriptionsByUserEmail(userEmail)) {
+            return SimpleResponseCreateDelivery.builder()
+                    .message("No subscription found for the user with email: " + userEmail)
+                    .success(false)
+                    .userId(null)
+                    .id(null)
+                    .random(0)
+                    .build();
+        }
+
+        String fromWhere = deliveryRequest.getFromWhere();
+        String toWhere = deliveryRequest.getToWhere();
+        log.info("Start checking addresses...");
+
+        boolean fromWhereExists = deliveryRepository.getSenderByFromWhere(fromWhere).contains(fromWhere);
+        boolean toWhereExists = deliveryRepository.getSenderByToWhere(toWhere).contains(toWhere);
+
+        if (!fromWhereExists && isAddressValid(fromWhere)) {
+            return SimpleResponseCreateDelivery.builder()
+                    .message("Адрес отправления не найден: " + fromWhere)
+                    .success(false)
+                    .userId(null)
+                    .id(null)
+                    .random(0)
+                    .build();
+        }
+
+        if (!toWhereExists && isAddressValid(toWhere)) {
+            return SimpleResponseCreateDelivery.builder()
+                    .message("Адрес назначения не найден: " + toWhere)
+                    .success(false)
+                    .userId(null)
+                    .id(null)
+                    .random(0)
+                    .build();
+        }
+
         Delivery delivery = new Delivery();
-        delivery.setUserName(deliveryRequest.getFullName());
-        delivery.setFromWhere(deliveryRequest.getFromWhere());
-        delivery.setToWhere(deliveryRequest.getToWhere());
+        delivery.setFromWhere(fromWhere);
+        delivery.setToWhere(toWhere);
         delivery.setDispatchDate(deliveryRequest.getDispatchDate());
         delivery.setArrivalDate(deliveryRequest.getArrivalDate());
         delivery.setDescription(deliveryRequest.getDescription());
-        delivery.setPackageType(deliveryRequest.getPackageType());
-        delivery.setTruckSize(deliveryRequest.getTruckSize());
-        delivery.setTransportType(deliveryRequest.getTransportType());
+        delivery.setUserName(deliveryRequest.getUserName());
         delivery.setTransportNumber(deliveryRequest.getTransportNumber());
         delivery.setSize(deliveryRequest.getSize());
-        delivery.setRole(deliveryRequest.getRole());
         delivery.setUser(user);
+
         deliveryRepository.save(delivery);
-        return delivery;
+
+        int randomCode = 100 + new Random().nextInt(900); // 100-999
+
+        log.info("Delivery successfully created for user: {}", userEmail);
+
+        return SimpleResponseCreateDelivery.builder()
+                .message("Delivery created successfully for user: " + userEmail)
+                .success(true)
+                .userId(user.getId())
+                .id(delivery.getId())
+                .random(randomCode)
+                .build();
     }
+
+
+
+
+
 
     @Override
     public List<CargoResponse> getAllArchivedDeliveries() {

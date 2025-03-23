@@ -1,15 +1,12 @@
 package aist.cargo.controller;
-
-import aist.cargo.dto.user.CargoResponse;
-import aist.cargo.dto.user.DeliveryRequest;
-import aist.cargo.dto.user.SearchRequest;
-import aist.cargo.dto.user.SimpleResponseCreate;
+import aist.cargo.dto.user.*;
 import aist.cargo.service.DeliveryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
@@ -33,11 +30,19 @@ public class DeliveryController {
         return deliveryService.getAllCargo(searchRequest);
     }
 
-    @PostMapping("create/Delivery")
-    public SimpleResponseCreate createDelivery(@RequestBody DeliveryRequest deliveryRequest, Principal principal) {
-        return deliveryService.createDelivery(deliveryRequest, principal.getName());
-
+    @PostMapping("/deliveriesTrue")
+    @Operation(
+            summary = "Create a delivery if the user is authenticated",
+            description = "This endpoint creates a new delivery if the user is authenticated. If the user is not authenticated, it returns an unauthorized response."
+    )
+    public ResponseEntity<SimpleResponseCreate> createDelivery(@RequestBody DeliveryForRequest request, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new SimpleResponseCreate("Колдонуучу кире элек", false));
+        }
+        return ResponseEntity.ok(deliveryService.TrueDelivery(request, principal.getName()));
     }
+
 
     @GetMapping("/getAllArchived")
     @Operation(summary = "Все архивированные доставки")
@@ -54,7 +59,7 @@ public class DeliveryController {
             @ApiResponse(responseCode = "404", description = "Delivery not found or does not belong to the user")
     })
     public ResponseEntity<String> archiveDelivery(@PathVariable Long deliveryId) {
-       return deliveryService.archiveDelivery(deliveryId);
+        return deliveryService.archiveDelivery(deliveryId);
     }
 
     @PutMapping("/activate/{id}")
@@ -65,6 +70,14 @@ public class DeliveryController {
             @ApiResponse(responseCode = "404", description = "Delivery not found or does not belong to the user")
     })
     public ResponseEntity<String> activateDelivery(@PathVariable Long id) {
-       return deliveryService.activateDelivery(id);
+        return deliveryService.activateDelivery(id);
     }
+
+    @PostMapping("/create")
+    @Operation(summary = "Create a new delivery", description = "This endpoint creates a new delivery record based on the provided delivery request.")
+    public ResponseEntity<SimpleResponseCreateDelivery> updateDelivery(@RequestBody DeliveryUpdateRequest deliveryRequest) {
+        SimpleResponseCreateDelivery response = deliveryService.createDelivery(deliveryRequest);
+        return ResponseEntity.ok(response);
+    }
+
 }

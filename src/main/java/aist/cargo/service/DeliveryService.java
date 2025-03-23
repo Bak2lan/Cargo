@@ -8,8 +8,8 @@ public interface DeliveryService {
 
     List<CargoResponse> getAllCargo(SearchRequest searchRequest);
 
-
-    SimpleResponseCreate createDelivery(DeliveryRequest deliveryRequest, String userEmail);
+    SimpleResponseCreateDelivery createDelivery (DeliveryUpdateRequest deliveryRequest);
+    SimpleResponseCreate TrueDelivery (DeliveryForRequest deliveryRequest, String userEmail);
 
     ResponseEntity<String> archiveDelivery(Long deliveryId);
 

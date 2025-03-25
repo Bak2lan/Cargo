@@ -79,5 +79,10 @@ public class DeliveryController {
         SimpleResponseCreateDelivery response = deliveryService.createDelivery(deliveryRequest);
         return ResponseEntity.ok(response);
     }
+    @PutMapping("/update")
+    public ResponseEntity<SimpleResponseCreate> updateDelivery(@RequestBody DeliveryUpdateForRequest deliveryRequest) {
+        SimpleResponseCreate response = deliveryService.updateDelivery(deliveryRequest);
+        return ResponseEntity.status(response.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST).body(response);
+    }
 
 }

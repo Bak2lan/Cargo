@@ -13,5 +13,8 @@ public class DeliveryUpdateForRequest {
     private String description;
     private LocalDate dispatchDate;
     private LocalDate arrivalDate;
+    private String fromWhere;
+    private String toWhere;
+    private String transportNumber;
     private Size size;
 }

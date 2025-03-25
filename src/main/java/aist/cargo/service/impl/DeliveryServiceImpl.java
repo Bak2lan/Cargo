@@ -82,6 +82,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         return new SimpleResponseCreate("Delivery details are valid.", true);
     }
+
     public boolean isAddressValid(String address) {
 
         try {
@@ -184,7 +185,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         deliveryRepository.save(delivery);
 
-        int  randomCode = 100 + new Random().nextInt(900); // 100-999
+        int randomCode = 100 + new Random().nextInt(900); // 100-999
 
         log.info("Delivery successfully created for user: {}", userEmail);
 
@@ -252,6 +253,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         deliveryJDBCTemplate.updateDeliveryStatus(deliveryId, "ACTIVE");
         return ResponseEntity.ok("Delivery successfully activated.");
     }
+
     @Transactional
     @Override
     public SimpleResponseCreate updateDelivery(DeliveryUpdateForRequest deliveryRequest) {
@@ -262,7 +264,8 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         String userEmail = authentication.getName();
         User user = userRepository.getUserByEmail(userEmail).orElseThrow(
-                () -> new NotFoundException("User not found with email: " + userEmail));
+                () -> new NotFoundException("User not found with email: " + userEmail)
+        );
 
         if (!userRepository.existsSubscriptionsByUserEmail(userEmail)) {
             return new SimpleResponseCreate("No subscription found for the user with email: " + userEmail, false);
@@ -271,21 +274,36 @@ public class DeliveryServiceImpl implements DeliveryService {
         Delivery delivery = deliveryRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new NotFoundException("Delivery not found for user: " + userEmail));
 
-        if (!delivery.getUser().getEmail().equals(userEmail)) {
-            return new SimpleResponseCreate("The delivery does not belong to the user: " + userEmail, false);
+        String fromWhere = deliveryRequest.getFromWhere();
+        String toWhere = deliveryRequest.getToWhere();
+        log.info("Start checking addresses...");
+
+        boolean fromWhereExists = deliveryRepository.getSenderByFromWhere(fromWhere).contains(fromWhere);
+        boolean toWhereExists = deliveryRepository.getSenderByToWhere(toWhere).contains(toWhere);
+
+        if (!fromWhereExists && isAddressValid(fromWhere)) {
+            return new SimpleResponseCreate("Адрес отправления не найден: " + fromWhere, false);
+        }
+        if (!toWhereExists && isAddressValid(toWhere)) {
+            return new SimpleResponseCreate("Адрес назначения не найден: " + toWhere, false);
         }
 
+        if (deliveryRepository.existsByTransportNumber(deliveryRequest.getTransportNumber()) &&
+                !delivery.getTransportNumber().equals(deliveryRequest.getTransportNumber())) {
+            return new SimpleResponseCreate("Transport number already exists: " + deliveryRequest.getTransportNumber(), false);
+        }
+
+        delivery.setFromWhere(fromWhere);
+        delivery.setToWhere(toWhere);
         delivery.setDispatchDate(deliveryRequest.getDispatchDate());
         delivery.setArrivalDate(deliveryRequest.getArrivalDate());
         delivery.setDescription(deliveryRequest.getDescription());
         delivery.setUserName(deliveryRequest.getUserName());
-        delivery.setSize(deliveryRequest.getSize());
-
+        delivery.setTransportNumber(deliveryRequest.getTransportNumber());
         delivery.setUser(user);
 
         deliveryRepository.save(delivery);
 
         return new SimpleResponseCreate("Delivery updated successfully for user: " + userEmail, true);
     }
-
 }

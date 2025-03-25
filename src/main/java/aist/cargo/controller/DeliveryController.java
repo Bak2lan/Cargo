@@ -79,10 +79,19 @@ public class DeliveryController {
         SimpleResponseCreateDelivery response = deliveryService.createDelivery(deliveryRequest);
         return ResponseEntity.ok(response);
     }
+    @Operation(
+            summary = "Update delivery",
+            description = "This endpoint allows the user to update delivery details."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated the delivery"),
+            @ApiResponse(responseCode = "400", description = "Bad request, invalid data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PutMapping("/update")
     public ResponseEntity<SimpleResponseCreate> updateDelivery(@RequestBody DeliveryUpdateForRequest deliveryRequest) {
         SimpleResponseCreate response = deliveryService.updateDelivery(deliveryRequest);
+
         return ResponseEntity.status(response.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST).body(response);
     }
-
 }

@@ -1,7 +1,5 @@
 package aist.cargo.controller;
-import aist.cargo.dto.user.SendingRequest;
-import aist.cargo.dto.user.SendingResponse;
-import aist.cargo.dto.user.SimpleResponseCreate;
+import aist.cargo.dto.user.*;
 import aist.cargo.service.SendingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,14 +21,30 @@ public class SendingController {
     }
 
     // Получение всех отправок
+    @Operation(
+            summary = "Get all sendings",
+            description = "This endpoint retrieves all the sendings from the system."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved all sendings"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/getAll")
     public ResponseEntity<List<SendingResponse>> getSendings() {
         List<SendingResponse> sendings = sendingService.getAllSendings();
         return ResponseEntity.ok(sendings);
     }
 
+    @Operation(
+            summary = "Get all sendings for user",
+            description = "This endpoint retrieves all the sendings for the authenticated user."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved sendings for the user"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/getAll/sendingsUser")
-    @Operation(summary = "get all sendings user", operationId = "Получить свои посылки")
     public List<SendingResponse> getAllUserSendings() {
         return sendingService.getAllSendingsUser();
     }
@@ -41,16 +55,29 @@ public class SendingController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/create/{id}")
-    public SimpleResponseCreate createSending(@RequestBody SendingRequest request) {
-        return sendingService.createSending(request);
+    @Operation(
+            summary = "Create true sending",
+            description = "This API endpoint allows the authenticated user to create a true sending by providing the necessary details like 'fromWhere', 'toWhere', and other relevant data."
+    )
+    @PostMapping("/createTrue")
+    public SimpleResponseCreate createSending(@RequestBody SendingCreateRequest request) {
+        return sendingService.createTrueSending(request);
     }
 
+    @Operation(
+            summary = "Update sending by ID",
+            description = "This endpoint updates the sending information based on the provided ID and sending details."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sending updated successfully"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - You don't have permission to update this sending"),
+            @ApiResponse(responseCode = "404", description = "Sending not found for the provided ID")
+    })
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateSending(@PathVariable Long id, @RequestBody SendingRequest sendingRequest) {
         try {
             sendingService.updateSending(id, sendingRequest);
-            return ResponseEntity.ok("Отправка успешно обновлена");
+            return ResponseEntity.ok("Sending updated successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
@@ -100,6 +127,31 @@ public class SendingController {
     public SimpleResponseCreate createSendingAll(@RequestBody SendingRequest sendingRequest) {
         return sendingService.createSending(sendingRequest);
     }
+    @Operation(
+            summary = "Create a new sending",
+            description = "This API endpoint allows the authenticated user to create a new sending. " +
+                    "You need to provide the details such as 'fromWhere', 'toWhere', 'dispatchDate', " +
+                    "and 'arrivalDate' for the new sending. A successful response will indicate the creation of the sending."
+    )
+    @PostMapping("/create")
+    public ResponseEntity<SimpleResponseCreateSending> createSending(@RequestBody SendingCreateUpdateRequest sendingRequest) {
+        SimpleResponseCreateSending response = sendingService.createSending(sendingRequest);
+        return ResponseEntity.status(response.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST).body(response);
+    }
+    @Operation(
+            summary = "Update sending",
+            description = "This API endpoint allows you to update the details of a sending for the authenticated user. " +
+                    "It requires the sending ID and the updated fields such as 'fromWhere', 'toWhere', 'dispatchDate', etc."
+    )
+    @PutMapping("/update")
+    public ResponseEntity<SimpleResponseCreate> updateSending(@RequestBody SendingUpdateRequest sendingRequest) {
+        SimpleResponseCreate response = sendingService.updateSending(sendingRequest);
 
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 }
 

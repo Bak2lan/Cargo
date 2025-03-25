@@ -16,4 +16,6 @@ public interface DeliveryService {
     ResponseEntity<String> activateDelivery(Long deliveryId);
 
     List<CargoResponse> getAllArchivedDeliveries();
+
+    SimpleResponseCreate updateDelivery(DeliveryUpdateForRequest deliveryRequest);
 }

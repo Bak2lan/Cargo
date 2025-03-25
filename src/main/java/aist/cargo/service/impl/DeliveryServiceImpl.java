@@ -1,5 +1,4 @@
 package aist.cargo.service.impl;
-
 import aist.cargo.dto.user.*;
 import aist.cargo.entity.Delivery;
 import aist.cargo.entity.User;
@@ -162,6 +161,16 @@ public class DeliveryServiceImpl implements DeliveryService {
                     .build();
         }
 
+        if (deliveryRepository.existsByTransportNumber(deliveryRequest.getTransportNumber())) {
+            return SimpleResponseCreateDelivery.builder()
+                    .message("Transport number already exists: " + deliveryRequest.getTransportNumber())
+                    .success(false)
+                    .userId(null)
+                    .id(null)
+                    .random(0)
+                    .build();
+        }
+
         Delivery delivery = new Delivery();
         delivery.setFromWhere(fromWhere);
         delivery.setToWhere(toWhere);
@@ -175,7 +184,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         deliveryRepository.save(delivery);
 
-        int randomCode = 100 + new Random().nextInt(900); // 100-999
+        int  randomCode = 100 + new Random().nextInt(900); // 100-999
 
         log.info("Delivery successfully created for user: {}", userEmail);
 
@@ -187,10 +196,6 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .random(randomCode)
                 .build();
     }
-
-
-
-
 
 
     @Override
@@ -247,4 +252,40 @@ public class DeliveryServiceImpl implements DeliveryService {
         deliveryJDBCTemplate.updateDeliveryStatus(deliveryId, "ACTIVE");
         return ResponseEntity.ok("Delivery successfully activated.");
     }
+    @Transactional
+    @Override
+    public SimpleResponseCreate updateDelivery(DeliveryUpdateForRequest deliveryRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return new SimpleResponseCreate("Unauthorized", false);
+        }
+
+        String userEmail = authentication.getName();
+        User user = userRepository.getUserByEmail(userEmail).orElseThrow(
+                () -> new NotFoundException("User not found with email: " + userEmail));
+
+        if (!userRepository.existsSubscriptionsByUserEmail(userEmail)) {
+            return new SimpleResponseCreate("No subscription found for the user with email: " + userEmail, false);
+        }
+
+        Delivery delivery = deliveryRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("Delivery not found for user: " + userEmail));
+
+        if (!delivery.getUser().getEmail().equals(userEmail)) {
+            return new SimpleResponseCreate("The delivery does not belong to the user: " + userEmail, false);
+        }
+
+        delivery.setDispatchDate(deliveryRequest.getDispatchDate());
+        delivery.setArrivalDate(deliveryRequest.getArrivalDate());
+        delivery.setDescription(deliveryRequest.getDescription());
+        delivery.setUserName(deliveryRequest.getUserName());
+        delivery.setSize(deliveryRequest.getSize());
+
+        delivery.setUser(user);
+
+        deliveryRepository.save(delivery);
+
+        return new SimpleResponseCreate("Delivery updated successfully for user: " + userEmail, true);
+    }
+
 }

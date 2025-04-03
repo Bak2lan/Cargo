@@ -225,17 +225,22 @@ public class DeliveryServiceImpl implements DeliveryService {
         User user = userServiceImpl.getAuthenticatedUser();
 
         if (deliveryJDBCTemplate.isDeliveryOwnedByUser(deliveryId, user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not have permission to archive this delivery.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You do not have permission to archive this delivery.");
         }
+
         String currentStatus = deliveryJDBCTemplate.getDeliveryStatus(deliveryId);
 
         if ("ARCHIVED".equals(currentStatus)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The delivery is already archived!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("The delivery is already archived!");
         }
 
         deliveryJDBCTemplate.updateDeliveryStatus(deliveryId, "ARCHIVED");
+
         return ResponseEntity.ok("Delivery successfully archived.");
     }
+
 
     @Override
     public ResponseEntity<String> activateDelivery(Long deliveryId) {

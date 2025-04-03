@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(userRequest.getPhoneNumber());
         user.setDateOfBirth(userRequest.getDateOfBirth());
         user.setRole(userRequest.getRole());
+        user.setUserImage(userRequest.getImage());
         return userRepository.save(user);
     }
 
@@ -55,6 +56,7 @@ public class UserServiceImpl implements UserService {
             updatedUser.setPhoneNumber(userRequest.getPhoneNumber());
             updatedUser.setDateOfBirth(userRequest.getDateOfBirth());
             updatedUser.setId(updatedUser.getId());
+            updatedUser.setUserImage(userRequest.getImage());
             userRepository.save(updatedUser);
             return UserResponse.builder()
                     .image(userRequest.getImage())
@@ -106,6 +108,7 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
                 .dateOfBirth(user.getDateOfBirth())
+                .image(user.getUserImage())
                 .build();
     }
 
@@ -119,7 +122,8 @@ public class UserServiceImpl implements UserService {
                         .lastName(user.getLastName())
                         .email(user.getEmail())
                         .phoneNumber(user.getPhoneNumber())
-                        .dateOfBirth(user.getDateOfBirth()).build()).toList();
+                        .dateOfBirth(user.getDateOfBirth())
+                        .image(user.getUserImage()).build()).toList();
     }
 
     public User getAuthenticatedUser() {

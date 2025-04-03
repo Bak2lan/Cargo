@@ -112,46 +112,46 @@ public class DeliveryJDBCTemplate {
 
     public CargoResponse getDeliveryById(Long deliveryById) {
         String sql = """
-                SELECT
-                    d.id AS id,
-                    u.id AS userId,
-                    u.user_image AS userImage,
-                    CONCAT(u.first_name, ' ', u.last_name) AS fullName,
-                    d.transport_number AS transportNumber,
-                    d.description AS description,
-                    d.from_where AS fromWhere,
-                    d.dispatch_date AS dispatchDate,
-                    d.to_where AS toWhere,
-                    d.arrival_date AS arrivalDate,
-                    d.package_type AS packageType,
-                    d.size AS size,
-                    u.phone_number AS phoneNumber,
-                    u.role AS roleType
-                FROM
-                    users u
-                LEFT JOIN deliveries d ON d.user_id = u.id
-                WHERE
-                    d.status = 'ARCHIVED'
-                    AND u.email != ?
-                ORDER BY d.arrival_date DESC
-                """;
+            SELECT
+                d.id AS id,
+                u.id AS userId,
+                u.user_image AS userImage,
+                CONCAT(u.first_name, ' ', u.last_name) AS fullName,
+                d.transport_number AS transportNumber,
+                d.description AS description,
+                d.from_where AS fromWhere,
+                d.dispatch_date AS dispatchDate,
+                d.to_where AS toWhere,
+                d.arrival_date AS arrivalDate,
+                d.package_type AS packageType,
+                d.size AS size,
+                u.phone_number AS phoneNumber,
+                u.role AS roleType
+            FROM
+                users u
+            LEFT JOIN deliveries d ON d.user_id = u.id
+            WHERE
+                d.status = 'ARCHIVED' AND
+                d.id = ?  -- deliveryById колдонулган
+            ORDER BY d.arrival_date DESC
+            """;
         try {
-            return jdbcTemplate.queryForObject(sql, this::getAllCargoRs, deliveryById);
+            return jdbcTemplate.queryForObject(sql, this::getAllCargoRs, deliveryById);  // Параметрди берүүгө тийиш
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("Доставка с ID " + deliveryById + " не найдена!");
         }
     }
 
     public String getDeliveryStatus(Long id) {
-        String sql = "SELECT status FROM deliveries WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, String.class, id);
+        String sql = "SELECT status FROM deliveries WHERE id = ?";  // SQL суроосу, жеткирүү статусун табуу
+        return jdbcTemplate.queryForObject(sql, String.class, id);  // Сураныч аткарылып, статус кайтарылат
     }
 
     public void updateDeliveryStatus(Long id, String status) {
         String sql = "UPDATE deliveries SET status = ? WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, status, id);
         if (rowsAffected == 0) {
-            throw new NotFoundException("Доставка с ID " + id + " не найдена!");
+            throw new NotFoundException("Доставка с ID " + id + " не найдена!"); // "Жеткирүү ID менен табылган жок!"
         }
     }
 

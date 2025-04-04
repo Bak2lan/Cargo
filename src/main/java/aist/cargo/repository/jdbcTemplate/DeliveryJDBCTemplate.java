@@ -112,31 +112,31 @@ public class DeliveryJDBCTemplate {
 
     public CargoResponse getDeliveryById(Long deliveryById) {
         String sql = """
-            SELECT
-                d.id AS id,
-                u.id AS userId,
-                u.user_image AS userImage,
-                CONCAT(u.first_name, ' ', u.last_name) AS fullName,
-                d.transport_number AS transportNumber,
-                d.description AS description,
-                d.from_where AS fromWhere,
-                d.dispatch_date AS dispatchDate,
-                d.to_where AS toWhere,
-                d.arrival_date AS arrivalDate,
-                d.package_type AS packageType,
-                d.size AS size,
-                u.phone_number AS phoneNumber,
-                u.role AS roleType
-            FROM
-                users u
-            LEFT JOIN deliveries d ON d.user_id = u.id
-            WHERE
-                d.status = 'ARCHIVED' AND
-                d.id = ?  -- deliveryById колдонулган
-            ORDER BY d.arrival_date DESC
-            """;
+        SELECT
+            d.id AS id,
+            u.id AS userId,
+            u.user_image AS userImage,
+            CONCAT(u.first_name, ' ', u.last_name) AS fullName,
+            d.transport_number AS transportNumber,
+            d.description AS description,
+            d.from_where AS fromWhere,
+            d.dispatch_date AS dispatchDate,
+            d.to_where AS toWhere,
+            d.arrival_date AS arrivalDate,
+            d.package_type AS packageType,
+            d.size AS size,
+            u.phone_number AS phoneNumber,
+            u.role AS roleType,
+            d.status AS status  -- кошумча, статус керек болушу мүмкүн
+        FROM
+            users u
+        LEFT JOIN deliveries d ON d.user_id = u.id
+        WHERE
+            d.id = ?
+        ORDER BY d.arrival_date DESC
+        """;
         try {
-            return jdbcTemplate.queryForObject(sql, this::getAllCargoRs, deliveryById);  // Параметрди берүүгө тийиш
+            return jdbcTemplate.queryForObject(sql, this::getAllCargoRs, deliveryById);
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("Доставка с ID " + deliveryById + " не найдена!");
         }

@@ -185,7 +185,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         deliveryRepository.save(delivery);
 
-        int randomCode = 100 + new Random().nextInt(900); // 100-999
+        int randomCode = 100 + new Random().nextInt(900);
 
         log.info("Delivery successfully created for user: {}", userEmail);
 
@@ -224,11 +224,10 @@ public class DeliveryServiceImpl implements DeliveryService {
     public ResponseEntity<String> archiveDelivery(Long deliveryId) {
         User user = userServiceImpl.getAuthenticatedUser();
 
-        if (deliveryJDBCTemplate.isDeliveryOwnedByUser(deliveryId, user.getId())) {
+        if (!deliveryJDBCTemplate.isDeliveryOwnedByUser(deliveryId, user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("You do not have permission to archive this delivery.");
         }
-
         String currentStatus = deliveryJDBCTemplate.getDeliveryStatus(deliveryId);
 
         if ("ARCHIVED".equals(currentStatus)) {

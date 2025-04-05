@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface DeliveryService {
-    CargoResponse getDeliveryById(Long deliveryId);
+    CargoDeliveryResponse getDeliveryById(Long deliveryId);
 
     List<CargoResponse> getAllCargo(SearchRequest searchRequest);
 

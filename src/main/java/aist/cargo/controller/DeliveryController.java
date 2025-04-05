@@ -21,7 +21,7 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     @GetMapping("/{deliveryId}")
-    public CargoResponse getDeliveryById(@PathVariable Long deliveryId) {
+    public CargoDeliveryResponse getDeliveryById(@PathVariable Long deliveryId) {
         return deliveryService.getDeliveryById(deliveryId);
     }
 

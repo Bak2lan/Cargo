@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -34,8 +35,33 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryRepository deliveryRepository;
 
     @Override
-    public CargoResponse getDeliveryById(Long deliveryId) {
-        return deliveryJDBCTemplate.getDeliveryById(deliveryId);
+    public CargoDeliveryResponse getDeliveryById(Long deliveryId) {
+        Optional<Delivery> deliveryOptional = deliveryRepository.findById(deliveryId);
+        if (deliveryOptional.isEmpty()) {
+            throw new NotFoundException("Delivery with ID " + deliveryId + " not found");
+        }
+        Delivery delivery = deliveryOptional.get();
+        User user = delivery.getUser();
+        if (user == null) {
+            throw new NotFoundException("User for delivery with ID " + deliveryId + " not found");
+        }
+        String fullName = user.getFirstName() + " " + user.getLastName();
+
+        return new CargoDeliveryResponse(
+                delivery.getId(),
+                user.getId(),
+                user.getUserImage(),
+                fullName,
+                delivery.getTransportNumber(),
+                delivery.getDescription(),
+                delivery.getFromWhere(),
+                delivery.getDispatchDate(),
+                delivery.getToWhere(),
+                delivery.getArrivalDate(),
+                delivery.getSize(),
+                user.getPhoneNumber(),
+                user.getRole()
+        );
     }
 
     @Override

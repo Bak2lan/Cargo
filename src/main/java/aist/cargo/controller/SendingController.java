@@ -50,8 +50,8 @@ public class SendingController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<SendingResponse> getSendingById(@PathVariable Long id) {
-        SendingResponse response = sendingService.getSendingById(id);
+    public ResponseEntity<SendingResponseGetId> getSendingById(@PathVariable Long id) {
+        SendingResponseGetId response = sendingService.getSendingById(id);
         return ResponseEntity.ok(response);
     }
 

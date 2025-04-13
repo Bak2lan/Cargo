@@ -82,11 +82,16 @@ public class SendingServiceImpl implements SendingService {
     }
 
     @Override
-    public SendingResponse getSendingById(Long sendingId) {
+    public SendingResponseGetId getSendingById(Long sendingId) {
         Sending sending = sendingRepository.findById(sendingId)
                 .orElseThrow(() -> new RuntimeException("Отправка не найдена"));
+        User user = sending.getUser();
+        if (user == null) {
+            throw new NotFoundException("User for sending with ID " + sendingId + " not found");
+        }
+        String fullName = user.getFirstName() + " " + user.getLastName();
 
-        return SendingResponse.builder()
+        return SendingResponseGetId.builder()
                 .id(sending.getId())
                 .fullName(sending.getUser().getFirstName() + " " + sending.getUser().getLastName())
                 .phoneNumber(sending.getUser().getPhoneNumber())
@@ -95,8 +100,9 @@ public class SendingServiceImpl implements SendingService {
                 .toWhere(sending.getToWhere())
                 .dispatchDate(sending.getDispatchDate())
                 .arrivalDate(sending.getArrivalDate())
-                .packageType(sending.getPackageType())
+                .imageUser(user.getUserImage())
                 .size(sending.getSize())
+                .fullName(fullName)
                 .build();
     }
 

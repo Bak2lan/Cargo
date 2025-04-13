@@ -10,7 +10,7 @@ public interface SendingService {
 
     List<SendingResponse> getAllSendings();
 
-    SendingResponse getSendingById(Long sendingId);
+    SendingResponseGetId getSendingById(Long sendingId);
 
     void updateSending(Long sendingId, SendingRequest sendingRequest);
 

@@ -65,19 +65,45 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
-    public List<CargoResponse> getAllCargo(SearchRequest searchRequest) {
-        User user = userServiceImpl.getAuthenticatedUser();
-        return deliveryJDBCTemplate.getAllCargo(
-                searchRequest.fromWhere(),
-                searchRequest.toWhere(),
-                searchRequest.dispatchDate(),
-                searchRequest.arrivalDate(),
-                searchRequest.packageType(),
-                searchRequest.size(),
-                searchRequest.role(),
-                user.getEmail()
-        );
+    public List<CargoResponseGetAll> getAllCargo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        List<Delivery> allDeliveries = deliveryRepository.findAll();
+
+        return allDeliveries.stream()
+                .map(delivery -> {
+                    User user = delivery.getUser();
+                    String fullName = (user != null ?
+                            (user.getFirstName() != null ? user.getFirstName() : "") + " " +
+                                    (user.getLastName() != null ? user.getLastName() : "")
+                            : "No User");
+
+                    boolean isOwner = user != null && user.getEmail().equals(currentUserEmail);
+                    if (delivery.getRandom() == null) {
+                        throw new NotFoundException("Random number must not be null.");
+                    }
+
+                    if (deliveryRepository.existsByRandom(delivery.getRandom())) {
+                        throw new NotFoundException("Random number already exists in the database!");
+                    }
+
+                    return CargoResponseGetAll.builder()
+                            .id(delivery.getId())
+                            .fromWhere(delivery.getFromWhere())
+                            .toWhere(delivery.getToWhere())
+                            .size(delivery.getSize())
+                            .fullName(fullName)
+                            .arrivalDate(delivery.getArrivalDate())
+                            .transportNumber(delivery.getTransportNumber())
+                            .dispatchDate(delivery.getDispatchDate())
+                            .random(delivery.getRandom())
+                            .isOwner(isOwner)
+                            .build();
+                })
+                .toList();
     }
+
 
     public SimpleResponseCreate TrueDelivery(DeliveryForRequest deliveryRequest, String userEmail) {
         User user = userRepository.getUserByEmail(userEmail).orElseThrow(
@@ -142,7 +168,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                     .success(false)
                     .userId(null)
                     .id(null)
-                    .random(0)
+                    .random(0L)
                     .build();
         }
 
@@ -157,7 +183,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                     .success(false)
                     .userId(null)
                     .id(null)
-                    .random(0)
+                    .random(0L)
                     .build();
         }
 
@@ -174,7 +200,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                     .success(false)
                     .userId(null)
                     .id(null)
-                    .random(0)
+                    .random(0L)
                     .build();
         }
 
@@ -184,7 +210,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                     .success(false)
                     .userId(null)
                     .id(null)
-                    .random(0)
+                    .random(0L)
                     .build();
         }
 
@@ -194,9 +220,10 @@ public class DeliveryServiceImpl implements DeliveryService {
                     .success(false)
                     .userId(null)
                     .id(null)
-                    .random(0)
+                    .random(0L)
                     .build();
         }
+        Long randomCode = 100 + new Random().nextLong(900);
 
         Delivery delivery = new Delivery();
         delivery.setFromWhere(fromWhere);
@@ -207,11 +234,12 @@ public class DeliveryServiceImpl implements DeliveryService {
         delivery.setUserName(deliveryRequest.getUserName());
         delivery.setTransportNumber(deliveryRequest.getTransportNumber());
         delivery.setSize(deliveryRequest.getSize());
+        delivery.setRandom(randomCode);
         delivery.setUser(user);
 
         deliveryRepository.save(delivery);
 
-        int randomCode = 100 + new Random().nextInt(900);
+
 
         log.info("Delivery successfully created for user: {}", userEmail);
 

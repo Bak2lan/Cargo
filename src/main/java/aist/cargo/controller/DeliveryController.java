@@ -26,8 +26,8 @@ public class DeliveryController {
     }
 
     @GetMapping("/search")
-    public List<CargoResponse> getAllCargo(@RequestBody SearchRequest searchRequest) {
-        return deliveryService.getAllCargo(searchRequest);
+    public List<CargoResponseGetAll> getAllCargo() {
+        return deliveryService.getAllCargo();
     }
 
     @PostMapping("/deliveriesTrue")

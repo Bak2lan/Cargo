@@ -57,17 +57,17 @@ VALUES ('2025-02-28', 99.0, '2025-01-01', 1, 1, 1, 'ONE_MONTH', 'CAR'),
 
 
 INSERT INTO deliveries (arrival_date, dispatch_date, id, user_id, description, from_where, package_type, size, to_where,
-                        transport_number, transport_type, truck_size, status)
-VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Delivery of fragile items', 'Bishkek', 'LUGGAGE', 'M', 'Naryn', '01KG312QWE', 'TRUCK', 'MEDIUM', 'ACTIVE'),
-       ('2025-02-15', '2025-02-10', 2, 2, 'Important documents', 'Bishkek', 'ENVELOPE', 'S', 'Cholpon-Ata', '09KG009KOL', 'CAR', 'SMALL','ARCHIVED'),
-       ('2025-02-20', '2025-02-15', 3, 3, 'Electronics', 'Bishkek', 'BOX', 'L', 'Tamchy', '01KG111ONE', 'AIRPLANE', 'LARGE','ARCHIVED'),
-       ('2025-02-25', '2025-02-20', 4, 1, 'Furniture', 'Talas', 'BOX', 'M', 'Balykchy', '04KG222KGZ', 'TRUCK', 'TRUCK', 'ACTIVE'),
-       ('2025-03-10', '2025-03-05', 5, 2, 'Books', 'Bishkek', 'LUGGAGE', 'M', 'Jalal-Abad', '05KG314TZG', 'CAR', 'SMALL','ARCHIVED'),
-       ('2025-03-15', '2025-03-10', 6, 3, 'Appliances', 'Bishkek', 'ENVELOPE', 'L', 'Karakol', '06KG415HTB', 'TRUCK', 'MEDIUM','ARCHIVED'),
-       ('2025-03-20', '2025-03-15', 7, 4, 'Clothing', 'Bishkek', 'ENVELOPE', 'S', 'Osh', '07KG517IUO', 'AIRPLANE', 'SMALL','ARCHIVED'),
-       ('2025-03-25', '2025-03-20', 8, 5, 'Furniture', 'Bishkek', 'LUGGAGE', 'L', 'Issyk-Kul', '08KG618VGB', 'TRUCK', 'LARGE', 'ACTIVE'),
-       ('2025-04-10', '2025-04-05', 9, 6, 'Toys', 'Bishkek', 'LUGGAGE', 'M', 'Kant', '09KG719GNC', 'CAR', 'MEDIUM', 'ACTIVE'),
-       ('2025-04-15', '2025-04-10', 10, 7, 'Sports Equipment', 'Bishkek', 'LUGGAGE', 'L', 'Naryn', '10KG820TGO', 'TRUCK', 'TRUCK', 'ACTIVE');
+                        transport_number, transport_type, truck_size, status,random)
+VALUES ('2025-02-10', '2025-02-05', 1, 1, 'Delivery of fragile items', 'Bishkek', 'LUGGAGE', 'M', 'Naryn', '01KG312QWE', 'TRUCK', 'MEDIUM', 'ACTIVE',111),
+       ('2025-02-15', '2025-02-10', 2, 2, 'Important documents', 'Bishkek', 'ENVELOPE', 'S', 'Cholpon-Ata', '09KG009KOL', 'CAR', 'SMALL','ARCHIVED',112),
+       ('2025-02-20', '2025-02-15', 3, 3, 'Electronics', 'Bishkek', 'BOX', 'L', 'Tamchy', '01KG111ONE', 'AIRPLANE', 'LARGE','ARCHIVED',113),
+       ('2025-02-25', '2025-02-20', 4, 1, 'Furniture', 'Talas', 'BOX', 'M', 'Balykchy', '04KG222KGZ', 'TRUCK', 'TRUCK', 'ACTIVE',114),
+       ('2025-03-10', '2025-03-05', 5, 2, 'Books', 'Bishkek', 'LUGGAGE', 'M', 'Jalal-Abad', '05KG314TZG', 'CAR', 'SMALL','ARCHIVED',114),
+       ('2025-03-15', '2025-03-10', 6, 3, 'Appliances', 'Bishkek', 'ENVELOPE', 'L', 'Karakol', '06KG415HTB', 'TRUCK', 'MEDIUM','ARCHIVED',116),
+       ('2025-03-20', '2025-03-15', 7, 4, 'Clothing', 'Bishkek', 'ENVELOPE', 'S', 'Osh', '07KG517IUO', 'AIRPLANE', 'SMALL','ARCHIVED',117),
+       ('2025-03-25', '2025-03-20', 8, 5, 'Furniture', 'Bishkek', 'LUGGAGE', 'L', 'Issyk-Kul', '08KG618VGB', 'TRUCK', 'LARGE', 'ACTIVE',118),
+       ('2025-04-10', '2025-04-05', 9, 6, 'Toys', 'Bishkek', 'LUGGAGE', 'M', 'Kant', '09KG719GNC', 'CAR', 'MEDIUM', 'ACTIVE',119),
+       ('2025-04-15', '2025-04-10', 10, 7, 'Sports Equipment', 'Bishkek', 'LUGGAGE', 'L', 'Naryn', '10KG820TGO', 'TRUCK', 'TRUCK', 'ACTIVE',120);
 
 
 INSERT INTO sendings (arrival_date, dispatch_date, id, user_id, description, from_where, package_type, size, to_where, status)

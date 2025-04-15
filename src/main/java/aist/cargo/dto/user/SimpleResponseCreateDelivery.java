@@ -12,5 +12,5 @@ public class SimpleResponseCreateDelivery {
     private boolean success;
     private  Long id;
     private Long userId;
-    private int random;
+    private Long random;
 }

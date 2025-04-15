@@ -6,7 +6,7 @@ import java.util.List;
 public interface DeliveryService {
     CargoDeliveryResponse getDeliveryById(Long deliveryId);
 
-    List<CargoResponse> getAllCargo(SearchRequest searchRequest);
+    List<CargoResponseGetAll> getAllCargo();
 
     SimpleResponseCreateDelivery createDelivery (DeliveryUpdateRequest deliveryRequest);
     SimpleResponseCreate TrueDelivery (DeliveryForRequest deliveryRequest, String userEmail);

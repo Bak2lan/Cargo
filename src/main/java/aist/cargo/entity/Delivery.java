@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.util.Random;
 
 @Entity
 @Table(name = "deliveries")
@@ -34,6 +35,7 @@ public class Delivery {
     private Role role;
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
+    private Long random;
 
     @ManyToOne(cascade = {
             CascadeType.DETACH,

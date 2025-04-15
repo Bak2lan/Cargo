@@ -18,4 +18,5 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     List<String> getSenderByToWhere(@Param("address") String address);;
     Optional<Delivery> findByUserEmail(String email);
     boolean existsByTransportNumber(String transportNumber);
+    boolean existsByRandom(Long random);
 }

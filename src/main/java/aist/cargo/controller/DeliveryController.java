@@ -20,9 +20,9 @@ import java.util.List;
 public class DeliveryController {
     private final DeliveryService deliveryService;
 
-    @GetMapping("/{deliveryId}")
-    public CargoDeliveryResponse getDeliveryById(@PathVariable Long deliveryId) {
-        return deliveryService.getDeliveryById(deliveryId);
+    @GetMapping
+    public CargoDeliveryResponse getDeliveryById() {
+        return deliveryService.getDeliveryById();
     }
 
     @GetMapping("/search")

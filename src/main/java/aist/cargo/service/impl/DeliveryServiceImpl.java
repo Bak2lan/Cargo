@@ -35,16 +35,18 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryRepository deliveryRepository;
 
     @Override
-    public CargoDeliveryResponse getDeliveryById(Long deliveryId) {
-        Optional<Delivery> deliveryOptional = deliveryRepository.findById(deliveryId);
-        if (deliveryOptional.isEmpty()) {
-            throw new NotFoundException("Delivery with ID " + deliveryId + " not found");
-        }
-        Delivery delivery = deliveryOptional.get();
+    public CargoDeliveryResponse getDeliveryById() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        Delivery delivery = deliveryRepository.findByUserEmail(currentUserEmail)
+                .orElseThrow(() -> new NotFoundException("Delivery not found for user: " + currentUserEmail));
+
         User user = delivery.getUser();
         if (user == null) {
-            throw new NotFoundException("User for delivery with ID " + deliveryId + " not found");
+            throw new NotFoundException("User for delivery with ID " + delivery.getId() + " not found");
         }
+
         String fullName = user.getFirstName() + " " + user.getLastName();
 
         return new CargoDeliveryResponse(
@@ -63,6 +65,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                 user.getRole()
         );
     }
+
 
     @Override
     public List<CargoResponseGetAll> getAllCargo() {
@@ -84,7 +87,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                         throw new NotFoundException("Random number must not be null.");
                     }
 
-                    if (deliveryRepository.existsByRandom(delivery.getRandom())) {
+                    if (!deliveryRepository.existsByRandom(delivery.getRandom())) {
                         throw new NotFoundException("Random number already exists in the database!");
                     }
 
@@ -106,8 +109,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 
     public SimpleResponseCreate TrueDelivery(DeliveryForRequest deliveryRequest, String userEmail) {
-        User user = userRepository.getUserByEmail(userEmail).orElseThrow(
-                () -> new NotFoundException("User not found email " + userEmail));
+        User user = userRepository.getUserByEmail(userEmail).orElseThrow(() -> new NotFoundException("User not found email " + userEmail));
 
         if (!userRepository.existsSubscriptionsByUserEmail(userEmail)) {
             return new SimpleResponseCreate("No subscription found for the user with email: " + userEmail, false);
